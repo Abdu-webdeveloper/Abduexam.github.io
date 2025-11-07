@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathology Quiz - MedQuiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c 0%, #2a4d8e 50%, #3a6fd0 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quiz-title {
+            font-size: 1.5rem;
+            color: #1a2a6c;
+        }
+
+        .quiz-info {
+            display: flex;
+            gap: 15px;
+        }
+
+        .info-box {
+            background: #f0f5ff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #1a2a6c;
+            font-weight: 500;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: #f0f5ff;
+            border-color: #a0b8e0;
+        }
+
+        .option.selected {
+            background: #e0ebff;
+            border-color: #3a6fd0;
+        }
+
+        .option.correct {
+            background: #e6f7e9;
+            border-color: #4caf50;
+        }
+
+        .option.incorrect {
+            background: #ffe6e6;
+            border-color: #f44336;
+        }
+
+        .option-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+
+        .selected .option-letter {
+            background: #3a6fd0;
+            color: white;
+        }
+
+        .correct .option-letter {
+            background: #4caf50;
+            color: white;
+        }
+
+        .incorrect .option-letter {
+            background: #f44336;
+            color: white;
+        }
+
+        .feedback-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f0f5ff;
+            display: none;
+        }
+
+        .feedback-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a2a6c;
+        }
+
+        .feedback-text {
+            line-height: 1.5;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: #1a2a6c;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #3a6fd0;
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            background: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .results-container {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #1a2a6c;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .score-percentage {
+            font-size: 2.5rem;
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .performance-summary {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f0f5ff;
+            text-align: left;
+        }
+
+        .performance-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a2a6c;
+        }
+
+        footer {
+            margin-top: auto;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .footer-links {
+            margin-top: 10px;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .quiz-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pathology Quiz</h1>
+            <p>Test your knowledge of General Pathology with immediate feedback and explanations</p>
+        </header>
+
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <div class="quiz-title">General Pathology Quiz</div>
+                <div class="quiz-info">
+                    <div class="info-box">Questions: <span id="question-count">50</span></div>
+                    <div class="info-box">Score: <span id="score">0</span>/<span id="total-questions">50</span></div>
+                </div>
+            </div>
+
+            <!-- Questions will be dynamically generated here -->
+            <div id="questions-container"></div>
+
+            <div class="navigation">
+                <button id="prev-btn" class="btn btn-secondary" disabled>Previous</button>
+                <button id="next-btn" class="btn">Next</button>
+            </div>
+
+            <div id="results-container" class="results-container">
+                <div class="score-circle">
+                    <div class="score-percentage" id="score-percentage">0%</div>
+                    <div>Score</div>
+                </div>
+                <div class="score-text" id="score-text">You scored 0 out of 50</div>
+                <div class="performance-summary">
+                    <div class="performance-title">Performance Summary:</div>
+                    <p id="performance-feedback">Based on your score, you may need to review the material.</p>
+                </div>
+                <button id="restart-btn" class="btn" style="margin-top: 20px;">Restart Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 MedQuiz. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="index.html">Back to Home</a>
+            <a href="#">Contact Us</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+    </footer>
+
+    <script>
+        // Comprehensive quiz data with 50+ questions
+        const quizData = [
+            {
+                question: "What is the definition of pathology?",
+                options: [
+                    "The study of drugs and their effects on the body",
+                    "The scientific study of disease",
+                    "The study of normal body functions",
+                    "The study of microorganisms"
+                ],
+                correct: "b",
+                explanation: "Pathology is defined as the scientific study of disease, derived from the Latin words 'patho' (disease) and 'logy' (study)."
+            },
+            {
+                question: "Which of the following is NOT one of the four core aspects of disease studied in pathology?",
+                options: [
+                    "Etiology",
+                    "Pathogenesis",
+                    "Morphologic changes",
+                    "Pharmacology"
+                ],
+                correct: "d",
+                explanation: "The four core aspects of disease in pathology are etiology (cause), pathogenesis (mechanism), morphologic changes (structural alterations), and functional derangements and clinical significance."
+            },
+            {
+                question: "What is the term for an increase in the size of cells?",
+                options: [
+                    "Hyperplasia",
+                    "Hypertrophy",
+                    "Atrophy",
+                    "Metaplasia"
+                ],
+                correct: "b",
+                explanation: "Hypertrophy is an increase in the size of cells, which leads to an increase in the size of the organ. Examples include enlargement of the left ventricle in hypertensive heart disease."
+            },
+            {
+                question: "Which type of necrosis is characterized by preservation of tissue architecture and is typically seen in myocardial infarction?",
+                options: [
+                    "Coagulative necrosis",
+                    "Liquefactive necrosis",
+                    "Caseous necrosis",
+                    "Fat necrosis"
+                ],
+                correct: "a",
+                explanation: "Coagulative necrosis is characterized by general preservation of tissue architecture and is most often seen with sudden interruption of blood supply to an organ, especially the heart."
+            },
+            {
+                question: "What are the five cardinal signs of acute inflammation?",
+                options: [
+                    "Redness, swelling, heat, pain, loss of function",
+                    "Fever, fatigue, nausea, vomiting, headache",
+                    "Pallor, coldness, numbness, weakness, dizziness",
+                    "Itching, scaling, blistering, crusting, scarring"
+                ],
+                correct: "a",
+                explanation: "The five cardinal signs of acute inflammation are redness (rubor), swelling (tumor), heat (calor), pain (dolor), and loss of function."
+            },
+            {
+                question: "Which cells are the primary cells involved in chronic inflammation?",
+                options: [
+                    "Neutrophils",
+                    "Eosinophils",
+                    "Macrophages and lymphocytes",
+                    "Basophils"
+                ],
+                correct: "c",
+                explanation: "Monocytes and macrophages are the primary cells in chronic inflammation. Other cells include T-lymphocytes, B-lymphocytes, plasma cells, mast cells, and eosinophils."
+            },
+            {
+                question: "What is the process by which lost tissue is replaced by granulation tissue which matures to form scar tissue?",
+                options: [
+                    "Regeneration",
+                    "Resolution",
+                    "Repair",
+                    "Metaplasia"
+                ],
+                correct: "c",
+                explanation: "Repair (healing by scarring) is the replacement of lost tissue by granulation tissue which matures to form scar tissue. This is different from regeneration, which is the replacement of lost tissue by tissues similar in type."
+            },
+            {
+                question: "Which of the following is a localized accumulation of fluid in body tissues?",
+                options: [
+                    "Hyperemia",
+                    "Congestion",
+                    "Edema",
+                    "Thrombosis"
+                ],
+                correct: "c",
+                explanation: "Edema is increased fluid in the interstitial tissue spaces. Hyperemia is an active increase in blood flow, congestion is a passive process from impaired outflow, and thrombosis is the formation of a blood clot."
+            },
+            {
+                question: "What are the three factors that predispose to thrombus formation, known as Virchow's triad?",
+                options: [
+                    "Endothelial injury, stasis or turbulence of blood flow, blood hypercoagulability",
+                    "Hypertension, hyperlipidemia, hyperglycemia",
+                    "Infection, inflammation, ischemia",
+                    "Anemia, leukocytosis, thrombocytopenia"
+                ],
+                correct: "a",
+                explanation: "Virchow's triad consists of endothelial injury, stasis or turbulence of blood flow, and blood hypercoagulability. These three factors predispose to thrombus formation."
+            },
+            {
+                question: "Which of the following is an example of an autosomal dominant disorder?",
+                options: [
+                    "Sickle cell anemia",
+                    "Cystic fibrosis",
+                    "Marfan syndrome",
+                    "Phenylketonuria"
+                ],
+                correct: "c",
+                explanation: "Marfan syndrome is an autosomal dominant disorder caused by mutations in the FBN1 gene. Sickle cell anemia, cystic fibrosis, and phenylketonuria are autosomal recessive disorders."
+            },
+            {
+                question: "What is the term for replacement of one differentiated tissue by another differentiated tissue?",
+                options: [
+                    "Hyperplasia",
+                    "Hypertrophy",
+                    "Atrophy",
+                    "Metaplasia"
+                ],
+                correct: "d",
+                explanation: "Metaplasia is the replacement of one differentiated tissue by another differentiated tissue. An example is squamous metaplasia in the bronchus of cigarette smokers."
+            },
+            {
+                question: "Which of the following is a characteristic feature of apoptosis?",
+                options: [
+                    "Cell swelling and rupture",
+                    "Inflammation",
+                    "Cell shrinkage and fragmentation",
+                    "Nuclear pyknosis, karyorrhexis, and karyolysis"
+                ],
+                correct: "c",
+                explanation: "Apoptosis is characterized by cell shrinkage and fragmentation into apoptotic bodies. It is not accompanied by inflammation, unlike necrosis."
+            },
+            {
+                question: "What is the most common cause of cellular injury?",
+                options: [
+                    "Chemical injury",
+                    "Physical injury",
+                    "Hypoxia",
+                    "Immunologic injury"
+                ],
+                correct: "c",
+                explanation: "Hypoxia (decreased oxygen supply) is the most common cause of cellular injury. It can result from ischemia, anemia, carbon monoxide poisoning, or poor oxygenation."
+            },
+            {
+                question: "Which of the following is a characteristic of labile cells?",
+                options: [
+                    "They have a continuous turnover by programmed division of stem cells",
+                    "They have a low level of replication but can undergo rapid division in response to injury",
+                    "They are non-dividing cells that cannot be replaced if lost",
+                    "They are found only in the nervous system"
+                ],
+                correct: "a",
+                explanation: "Labile cells have a continuous turnover by programmed division of stem cells. They are found in surface epithelium of the GI tract, urinary tract, skin, and in lymphoid and hematopoietic systems."
+            },
+            {
+                question: "What is the term for a decrease in the size of a cell?",
+                options: [
+                    "Hyperplasia",
+                    "Hypertrophy",
+                    "Atrophy",
+                    "Metaplasia"
+                ],
+                correct: "c",
+                explanation: "Atrophy is a decrease in the size of a cell, which can lead to decreased size of the organ. Causes include disuse, undernutrition, decreased endocrine stimulation, denervation, and old age."
+            },
+            {
+                question: "Which type of inflammation is characterized by the production of large amounts of pus?",
+                options: [
+                    "Serous inflammation",
+                    "Fibrinous inflammation",
+                    "Suppurative inflammation",
+                    "Catarrhal inflammation"
+                ],
+                correct: "c",
+                explanation: "Suppurative (purulent) inflammation is characterized by the production of large amounts of pus, which consists of living or dead leukocytes, necrotic tissue debris, bacteria, and edema fluid."
+            },
+            {
+                question: "What is the term for a circumscribed accumulation of pus in a living tissue?",
+                options: [
+                    "Ulcer",
+                    "Fistula",
+                    "Abscess",
+                    "Granuloma"
+                ],
+                correct: "c",
+                explanation: "An abscess is a circumscribed accumulation of pus in a living tissue, encapsulated by a pyogenic membrane consisting of layers of fibrin, inflammatory cells, and granulation tissue."
+            },
+            {
+                question: "Which of the following is a characteristic of granulomatous inflammation?",
+                options: [
+                    "Predominance of neutrophils",
+                    "Presence of epithelioid cells and giant cells",
+                    "Extensive tissue destruction with minimal cellular response",
+                    "Formation of fibrin-rich exudate"
+                ],
+                correct: "b",
+                explanation: "Granulomatous inflammation is characterized by the presence of granulomas, which are microscopic aggregates of epithelioid cells (activated macrophages) and often contain multinucleated giant cells."
+            },
+            {
+                question: "What is the primary chemical mediator released from mast cells in type I hypersensitivity?",
+                options: [
+                    "Prostaglandins",
+                    "Histamine",
+                    "Bradykinin",
+                    "Complement"
+                ],
+                correct: "b",
+                explanation: "Histamine is the primary preformed mediator released from mast cells in type I hypersensitivity reactions. It causes vasodilation, increased vascular permeability, and smooth muscle contraction."
+            },
+            {
+                question: "Which of the following is a characteristic of healing by first intention?",
+                options: [
+                    "Extensive tissue loss",
+                    "Formation of large amounts of granulation tissue",
+                    "Wound contraction",
+                    "Minimal tissue loss with edges approximated"
+                ],
+                correct: "d",
+                explanation: "Healing by first intention (primary union) occurs with minimal tissue loss and when wound edges are approximated, such as in a clean surgical incision."
+            },
+            {
+                question: "What is the term for the phenomenon where the same genetic mutation causes a phenotypic spectrum?",
+                options: [
+                    "Penetrance",
+                    "Expressivity",
+                    "Pleiotropy",
+                    "Anticipation"
+                ],
+                correct: "b",
+                explanation: "Variable expressivity is the ability of the same genetic mutation to cause a phenotypic spectrum. For example, neurofibromatosis type 1 can manifest as only café au lait spots or as multiple tumors and skeletal deformities."
+            },
+            {
+                question: "Which of the following is a feature of Down syndrome?",
+                options: [
+                    "Tall stature",
+                    "Webbed neck",
+                    "Mental retardation and characteristic facial features",
+                    "Gynecomastia"
+                ],
+                correct: "c",
+                explanation: "Down syndrome is characterized by severe mental retardation, broad flat nasal bridge, oblique palpebral fissures, epicanthic folds, large protruding tongue, and congenital heart disease in about 40% of cases."
+            },
+            {
+                question: "What is the most common cause of pulmonary thromboembolism?",
+                options: [
+                    "Thrombi in the deep leg veins",
+                    "Thrombi in the cerebral arteries",
+                    "Thrombi in the coronary arteries",
+                    "Thrombi in the hepatic veins"
+                ],
+                correct: "a",
+                explanation: "95% of pulmonary thromboemboli arise from thrombi in the deep leg veins. These thromboemboli travel with venous return to the right side of the heart and then to the pulmonary arteries."
+            },
+            {
+                question: "Which of the following is a characteristic of Klinefelter syndrome?",
+                options: [
+                    "Short stature",
+                    "Female hypogonadism",
+                    "Male hypogonadism with tall stature",
+                    "Webbed neck"
+                ],
+                correct: "c",
+                explanation: "Klinefelter syndrome (47,XXY) is characterized by male hypogonadism, tall stature, eunuchoid appearance, gynecomastia, and infertility due to atrophic testes with decreased spermatogenesis."
+            },
+            {
+                question: "What is the term for the process by which fluid moves across the capillary wall?",
+                options: [
+                    "Osmosis",
+                    "Filtration",
+                    "Diffusion",
+                    "Active transport"
+                ],
+                correct: "b",
+                explanation: "Fluid movement across the capillary wall is determined by the balance between hydrostatic and oncotic pressures, a process described by Starling forces that results in filtration."
+            },
+            {
+                question: "Which of the following is a feature of Turner syndrome?",
+                options: [
+                    "Tall stature",
+                    "Male hypogonadism",
+                    "Female hypogonadism with short stature",
+                    "Mental retardation"
+                ],
+                correct: "c",
+                explanation: "Turner syndrome (45,X) is characterized by female hypogonadism, short stature, webbed neck, shield-like chest with widely spaced nipples, and replacement of ovaries by fibrous streaks."
+            },
+            {
+                question: "What is the term for the reversible transmission between life and biologic death?",
+                options: [
+                    "Clinical death",
+                    "Biological death",
+                    "Somatic death",
+                    "Cellular death"
+                ],
+                correct: "a",
+                explanation: "Clinical death is the reversible transmission between life and biologic death, defined as the period of respiratory, circulatory and brain arrest during which initiation of resuscitation can lead to recovery."
+            },
+            {
+                question: "Which of the following is a characteristic of irreversible cell injury?",
+                options: [
+                    "Cellular swelling",
+                    "Disaggregation of ribosomes",
+                    "Massive calcium influx and membrane damage",
+                    "Failure of Na-K pump"
+                ],
+                correct: "c",
+                explanation: "Irreversible cell injury is characterized by massive calcium influx, very low pH, and activation of enzymes that damage cell membrane and organelle membranes. This marks the point of no return for the cell."
+            },
+            {
+                question: "What is the term for the process by which leukocytes move from blood vessels to tissues during inflammation?",
+                options: [
+                    "Chemotaxis",
+                    "Margination",
+                    "Diapedesis",
+                    "Phagocytosis"
+                ],
+                correct: "c",
+                explanation: "Diapedesis is the process by which leukocytes escape from venules and small veins by extending pseudopodia through the vascular wall and moving into the tissues."
+            },
+            {
+                question: "Which of the following is a characteristic of systemic lupus erythematosus?",
+                options: [
+                    "It primarily affects males",
+                    "It is characterized by antinuclear antibodies",
+                    "It rarely involves the kidneys",
+                    "It is not associated with autoimmune phenomena"
+                ],
+                correct: "b",
+                explanation: "Systemic lupus erythematosus is characterized by a bewildering array of autoantibodies, particularly antinuclear antibodies (ANAs). It primarily affects women of childbearing age and commonly involves the kidneys, skin, joints, and serosal membranes."
+            },
+            {
+                question: "What is the term for the process by which a thrombus is removed by the action of fibrinolytic enzymes?",
+                options: [
+                    "Propagation",
+                    "Organization",
+                    "Dissolution",
+                    "Recanalization"
+                ],
+                correct: "c",
+                explanation: "Dissolution is the process by which a thrombus may be removed by fibrinolytic activity, particularly if the thrombus is small and the fibrinolytic system is active."
+            },
+            {
+                question: "Which of the following is a characteristic of fat embolism?",
+                options: [
+                    "It typically occurs after myocardial infarction",
+                    "It is usually asymptomatic",
+                    "It causes occlusion of pulmonary or cerebral microvasculature",
+                    "It is most common in elderly women"
+                ],
+                correct: "c",
+                explanation: "Fat embolism typically follows fracture of bones and other types of tissue injury. In severe cases, fat emboli may cause occlusion of pulmonary or cerebral microvasculature, leading to fat embolism syndrome."
+            },
+            {
+                question: "What is the term for an area of ischemic necrosis caused by occlusion of either arterial supply or venous drainage?",
+                options: [
+                    "Thrombosis",
+                    "Embolism",
+                    "Infarction",
+                    "Necrosis"
+                ],
+                correct: "c",
+                explanation: "An infarct is an area of ischemic necrosis caused by occlusion of either the arterial supply or venous drainage in a particular tissue. Nearly 99% of all infarcts result from thrombotic or embolic events."
+            },
+            {
+                question: "Which of the following is a characteristic of red infarcts?",
+                options: [
+                    "They occur in solid organs",
+                    "They are caused by arterial occlusion only",
+                    "They occur in loose tissues or tissues with dual circulation",
+                    "They are always septic"
+                ],
+                correct: "c",
+                explanation: "Red (hemorrhagic) infarcts occur in loose tissues such as the lung which allow blood to collect in the infarct zone, in tissues with dual circulations, in venous occlusions, or when blood flow is reestablished to a site of previous arterial occlusion."
+            },
+            {
+                question: "What is the term for a state in which there is failure of the circulatory system to maintain adequate cellular perfusion?",
+                options: [
+                    "Edema",
+                    "Congestion",
+                    "Shock",
+                    "Infarction"
+                ],
+                correct: "c",
+                explanation: "Shock is a state in which there is failure of the circulatory system to maintain adequate cellular perfusion resulting in widespread reduction in delivery of oxygen and other nutrients to tissues."
+            },
+            {
+                question: "Which of the following is a characteristic of disseminated intravascular coagulation (DIC)?",
+                options: [
+                    "It is always a primary disease",
+                    "It results in increased levels of all coagulation factors",
+                    "It is characterized by simultaneous bleeding and thrombosis",
+                    "It primarily affects young, healthy individuals"
+                ],
+                correct: "c",
+                explanation: "DIC is a thrombohemorrhagic disorder characterized by widespread microvascular thrombosis and consumption of coagulation factors, leading to a bleeding diathesis. It occurs as a complication of various clinical conditions."
+            },
+            {
+                question: "What is the term for the process by which cells are programmed to die during normal development?",
+                options: [
+                    "Necrosis",
+                    "Apoptosis",
+                    "Autolysis",
+                    "Heterolysis"
+                ],
+                correct: "b",
+                explanation: "Apoptosis is the programmed death of single cells within clusters of other cells. It occurs as a physiologic process for removal of cells during embryogenesis, menstruation, etc."
+            },
+            {
+                question: "Which of the following is a characteristic of autosomal recessive disorders?",
+                options: [
+                    "They are expressed in heterozygotes",
+                    "They often show variable expressivity",
+                    "They commonly show complete penetrance",
+                    "They typically manifest in adulthood"
+                ],
+                correct: "c",
+                explanation: "Autosomal recessive disorders commonly show complete penetrance and more uniform expression of the trait than autosomal dominant disorders. They frequently show signs and symptoms early in life."
+            },
+            {
+                question: "What is the term for the presence of 2 or more cell lines with different karyotypes in a single individual?",
+                options: [
+                    "Aneuploidy",
+                    "Polyploidy",
+                    "Mosaicism",
+                    "Chimerism"
+                ],
+                correct: "c",
+                explanation: "Mosaicism is the presence of 2 or more cell lines with different karyotypes in a single individual. It is caused by mitotic errors in early development."
+            },
+            {
+                question: "Which of the following is a characteristic of X-linked recessive disorders?",
+                options: [
+                    "They show male-to-male transmission",
+                    "They affect males and females equally",
+                    "They are transmitted by affected males to all their sons",
+                    "They are more severe in males than in females"
+                ],
+                correct: "d",
+                explanation: "X-linked recessive disorders are more severe in males than in females because males have only one X chromosome and will show the full phenotype, while females may have partial expression due to X-chromosome inactivation."
+            },
+            {
+                question: "What is the term for the process by which neutrophils engulf and destroy microorganisms?",
+                options: [
+                    "Chemotaxis",
+                    "Margination",
+                    "Diapedesis",
+                    "Phagocytosis"
+                ],
+                correct: "d",
+                explanation: "Phagocytosis is the process of engulfment and internalization by specialized cells of particulate material, which includes invading microorganisms, damaged cells, and tissue debris."
+            },
+            {
+                question: "Which of the following is a characteristic of chronic inflammation?",
+                options: [
+                    "Short duration",
+                    "Predominance of neutrophils",
+                    "Presence of fibrosis",
+                    "Absence of tissue destruction"
+                ],
+                correct: "c",
+                explanation: "Chronic inflammation is characterized by long duration, presence of macrophages and lymphocytes, tissue destruction, and fibrosis (scar formation)."
+            },
+            {
+                question: "What is the term for the process by which new blood vessels form during healing?",
+                options: [
+                    "Angiogenesis",
+                    "Vasodilation",
+                    "Vasoconstriction",
+                    "Vascularization"
+                ],
+                correct: "a",
+                explanation: "Angiogenesis (neovascularization) is the proliferation and formation of new small blood vessels during healing. It starts 48 to 72 hours after injury and lasts for several days."
+            },
+            {
+                question: "Which of the following is a characteristic of healing by second intention?",
+                options: [
+                    "Minimal tissue loss",
+                    "Rapid healing",
+                    "Wound contraction",
+                    "Absence of granulation tissue"
+                ],
+                correct: "c",
+                explanation: "Healing by second intention (secondary union) occurs with more extensive tissue loss and is characterized by the formation of abundant granulation tissue and wound contraction."
+            },
+            {
+                question: "What is the term for an exaggerated immune response that results in tissue injury?",
+                options: [
+                    "Autoimmunity",
+                    "Immunodeficiency",
+                    "Hypersensitivity",
+                    "Tolerance"
+                ],
+                correct: "c",
+                explanation: "Hypersensitivity is an exaggerated immune response that results in tissue injury. It is classified into four types (I-IV) based on the mechanism involved."
+            },
+            {
+                question: "Which of the following is a characteristic of type II hypersensitivity?",
+                options: [
+                    "It is mediated by IgE antibodies",
+                    "It involves immune complex deposition",
+                    "It is antibody-mediated and often involves complement activation",
+                    "It is T-cell mediated"
+                ],
+                correct: "c",
+                explanation: "Type II hypersensitivity is mediated by antibodies directed towards antigens present on cell surfaces. It often involves complement activation and can result in cell lysis, opsonization, or antibody-dependent cellular cytotoxicity."
+            },
+            {
+                question: "What is the term for the state in which an individual is incapable of developing an immune response to specific antigens?",
+                options: [
+                    "Autoimmunity",
+                    "Hypersensitivity",
+                    "Tolerance",
+                    "Immunodeficiency"
+                ],
+                correct: "c",
+                explanation: "Immunologic tolerance is a state in which an individual is incapable of developing an immune response to specific antigens. Self-tolerance refers to lack of responsiveness to an individual's own antigens."
+            },
+            {
+                question: "Which of the following is a characteristic of autosomal dominant disorders?",
+                options: [
+                    "They are expressed only in homozygotes",
+                    "They often show reduced penetrance",
+                    "They typically manifest only in childhood",
+                    "They are always caused by new mutations"
+                ],
+                correct: "b",
+                explanation: "Autosomal dominant disorders can show reduced penetrance, meaning some individuals inherit the mutant gene but are phenotypically normal. They can also show variable expressivity."
+            },
+            {
+                question: "What is the term for the process by which the inactive X chromosome is visible as a condensed mass of chromatin?",
+                options: [
+                    "Lyonization",
+                    "Barr body",
+                    "X inactivation",
+                    "All of the above"
+                ],
+                correct: "d",
+                explanation: "The inactive X-chromosome may be visible in an interphase cell as a condensed mass of chromatin called the Barr body. This is the result of X-chromosome inactivation or lyonization."
+            },
+            {
+                question: "Which of the following is a characteristic of multifactorial disorders?",
+                options: [
+                    "They are caused by a single gene mutation",
+                    "They follow classic Mendelian inheritance patterns",
+                    "They result from the combined actions of environmental factors and multiple genes",
+                    "They are always congenital"
+                ],
+                correct: "c",
+                explanation: "Multifactorial disorders result from the combined actions of environmental factors and two or more mutant genes having additive effects. Examples include diabetes mellitus, hypertension, and ischemic heart disease."
+            }
+        ];
+
+        // DOM elements
+        const questionsContainer = document.getElementById('questions-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreElement = document.getElementById('score');
+        const scorePercentage = document.getElementById('score-percentage');
+        const scoreText = document.getElementById('score-text');
+        const performanceFeedback = document.getElementById('performance-feedback');
+        const questionCountElement = document.getElementById('question-count');
+        const totalQuestionsElement = document.getElementById('total-questions');
+
+        // Quiz state
+        let currentQuestion = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+        let score = 0;
+
+        // Initialize quiz
+        function initQuiz() {
+            questionCountElement.textContent = quizData.length;
+            totalQuestionsElement.textContent = quizData.length;
+            
+            // Generate questions dynamically
+            quizData.forEach((questionData, index) => {
+                const questionContainer = document.createElement('div');
+                questionContainer.className = 'question-container';
+                questionContainer.id = `question-${index + 1}`;
+                questionContainer.style.display = index === 0 ? 'block' : 'none';
+                
+                questionContainer.innerHTML = `
+                    <div class="question-number">Question ${index + 1} of ${quizData.length}</div>
+                    <div class="question-text">${questionData.question}</div>
+                    <div class="options-container">
+                        ${questionData.options.map((option, optIndex) => `
+                            <div class="option" data-value="${String.fromCharCode(97 + optIndex)}">
+                                <span class="option-letter">${String.fromCharCode(65 + optIndex)}</span>
+                                <span class="option-text">${option}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="feedback-container" id="feedback-${index + 1}">
+                        <div class="feedback-title">Explanation:</div>
+                        <div class="feedback-text">${questionData.explanation}</div>
+                    </div>
+                `;
+                
+                questionsContainer.appendChild(questionContainer);
+            });
+            
+            // Add event listeners to options
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    selectOption(this);
+                });
+            });
+            
+            updateNavigation();
+        }
+
+        // Update navigation buttons
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === quizData.length - 1) {
+                nextBtn.textContent = 'Submit';
+            } else {
+                nextBtn.textContent = 'Next';
+            }
+            
+            // Highlight selected option if exists
+            if (userAnswers[currentQuestion] !== null) {
+                const selectedOption = document.querySelector(`#question-${currentQuestion + 1} .option[data-value="${userAnswers[currentQuestion]}"]`);
+                if (selectedOption) {
+                    selectedOption.classList.add('selected');
+                }
+            }
+        }
+
+        // Show question
+        function showQuestion(index) {
+            document.querySelectorAll('.question-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            const currentContainer = document.getElementById(`question-${index + 1}`);
+            if (currentContainer) {
+                currentContainer.style.display = 'block';
+            }
+            
+            updateNavigation();
+        }
+
+        // Select option
+        function selectOption(optionElement) {
+            const questionContainer = optionElement.closest('.question-container');
+            const optionsInQuestion = questionContainer.querySelectorAll('.option');
+            const feedbackContainer = questionContainer.querySelector('.feedback-container');
+            const questionIndex = Array.from(document.querySelectorAll('.question-container')).indexOf(questionContainer);
+            const correctAnswer = quizData[questionIndex].correct;
+            const selectedAnswer = optionElement.getAttribute('data-value');
+            
+            // Remove selected class from all options in this question
+            optionsInQuestion.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Add appropriate classes
+            optionsInQuestion.forEach(opt => {
+                if (opt.getAttribute('data-value') === correctAnswer) {
+                    opt.classList.add('correct');
+                } else if (opt.getAttribute('data-value') === selectedAnswer && selectedAnswer !== correctAnswer) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            optionElement.classList.add('selected');
+            
+            // Store user's answer
+            userAnswers[questionIndex] = selectedAnswer;
+            
+            // Show feedback
+            feedbackContainer.style.display = 'block';
+            
+            // Update score display
+            updateScoreDisplay();
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            score = 0;
+            for (let i = 0; i < quizData.length; i++) {
+                if (userAnswers[i] === quizData[i].correct) {
+                    score++;
+                }
+            }
+            scoreElement.textContent = score;
+        }
+
+        // Calculate and display results
+        function showResults() {
+            // Calculate score
+            score = 0;
+            for (let i = 0; i < quizData.length; i++) {
+                if (userAnswers[i] === quizData[i].correct) {
+                    score++;
+                }
+            }
+            
+            // Update score display
+            const percentage = Math.round((score / quizData.length) * 100);
+            scorePercentage.textContent = `${percentage}%`;
+            scoreText.textContent = `You scored ${score} out of ${quizData.length}`;
+            
+            // Provide feedback based on score
+            if (percentage >= 90) {
+                performanceFeedback.textContent = "Excellent! You have a strong understanding of general pathology concepts.";
+            } else if (percentage >= 80) {
+                performanceFeedback.textContent = "Very good! You have a solid foundation in pathology with minor areas for improvement.";
+            } else if (percentage >= 70) {
+                performanceFeedback.textContent = "Good job! You have a good understanding but could benefit from reviewing some topics.";
+            } else if (percentage >= 60) {
+                performanceFeedback.textContent = "Fair performance. Consider reviewing the material to strengthen your understanding.";
+            } else {
+                performanceFeedback.textContent = "You may need to spend more time studying the pathology material to improve your knowledge.";
+            }
+            
+            // Hide quiz and show results
+            document.querySelector('.quiz-container > .question-container').style.display = 'none';
+            document.querySelector('.navigation').style.display = 'none';
+            resultsContainer.style.display = 'block';
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = Array(quizData.length).fill(null);
+            score = 0;
+            
+            // Reset all options and feedback
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            document.querySelectorAll('.feedback-container').forEach(feedback => {
+                feedback.style.display = 'none';
+            });
+            
+            // Show first question and hide results
+            showQuestion(0);
+            document.querySelector('.navigation').style.display = 'flex';
+            resultsContainer.style.display = 'none';
+            
+            // Update score display
+            scoreElement.textContent = '0';
+        }
+
+        // Event listeners for navigation
+        prevBtn.addEventListener('click', function() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        nextBtn.addEventListener('click', function() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                showResults();
+            }
+        });
+
+        restartBtn.addEventListener('click', restartQuiz);
+
+        // Initialize the quiz
+        initQuiz();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathology Quiz - MedQuiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c 0%, #2a4d8e 50%, #3a6fd0 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quiz-title {
+            font-size: 1.5rem;
+            color: #1a2a6c;
+        }
+
+        .quiz-info {
+            display: flex;
+            gap: 15px;
+        }
+
+        .info-box {
+            background: #f0f5ff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #1a2a6c;
+            font-weight: 500;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: #f0f5ff;
+            border-color: #a0b8e0;
+        }
+
+        .option.selected {
+            background: #e0ebff;
+            border-color: #3a6fd0;
+        }
+
+        .option.correct {
+            background: #e6f7e9;
+            border-color: #4caf50;
+        }
+
+        .option.incorrect {
+            background: #ffe6e6;
+            border-color: #f44336;
+        }
+
+        .option-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+
+        .selected .option-letter {
+            background: #3a6fd0;
+            color: white;
+        }
+
+        .correct .option-letter {
+            background: #4caf50;
+            color: white;
+        }
+
+        .incorrect .option-letter {
+            background: #f44336;
+            color: white;
+        }
+
+        .feedback-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f0f5ff;
+            display: none;
+        }
+
+        .feedback-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a2a6c;
+        }
+
+        .feedback-text {
+            line-height: 1.5;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: #1a2a6c;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #3a6fd0;
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            background: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .results-container {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #1a2a6c;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .score-percentage {
+            font-size: 2.5rem;
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .performance-summary {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f0f5ff;
+            text-align: left;
+        }
+
+        .performance-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a2a6c;
+        }
+
+        footer {
+            margin-top: auto;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .footer-links {
+            margin-top: 10px;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .quiz-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pathology Quiz</h1>
+            <p>Test your knowledge of General Pathology with immediate feedback and explanations</p>
+        </header>
+
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <div class="quiz-title">General Pathology Quiz</div>
+                <div class="quiz-info">
+                    <div class="info-box">Questions: <span id="question-count">50</span></div>
+                    <div class="info-box">Score: <span id="score">0</span>/<span id="total-questions">50</span></div>
+                </div>
+            </div>
+
+            <!-- Questions will be dynamically generated here -->
+            <div id="questions-container"></div>
+
+            <div class="navigation">
+                <button id="prev-btn" class="btn btn-secondary" disabled>Previous</button>
+                <button id="next-btn" class="btn">Next</button>
+            </div>
+
+            <div id="results-container" class="results-container">
+                <div class="score-circle">
+                    <div class="score-percentage" id="score-percentage">0%</div>
+                    <div>Score</div>
+                </div>
+                <div class="score-text" id="score-text">You scored 0 out of 50</div>
+                <div class="performance-summary">
+                    <div class="performance-title">Performance Summary:</div>
+                    <p id="performance-feedback">Based on your score, you may need to review the material.</p>
+                </div>
+                <button id="restart-btn" class="btn" style="margin-top: 20px;">Restart Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 MedQuiz. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="index.html">Back to Home</a>
+            <a href="#">Contact Us</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+    </footer>
+
+    <script>
+        // Comprehensive quiz data with 50+ questions
+        const quizData = [
+            {
+                question: "What is the definition of pathology?",
+                options: [
+                    "The study of drugs and their effects on the body",
+                    "The scientific study of disease",
+                    "The study of normal body functions",
+                    "The study of microorganisms"
+                ],
+                correct: "b",
+                explanation: "Pathology is defined as the scientific study of disease, derived from the Latin words 'patho' (disease) and 'logy' (study)."
+            },
+            {
+                question: "Which of the following is NOT one of the four core aspects of disease studied in pathology?",
+                options: [
+                    "Etiology",
+                    "Pathogenesis",
+                    "Morphologic changes",
+                    "Pharmacology"
+                ],
+                correct: "d",
+                explanation: "The four core aspects of disease in pathology are etiology (cause), pathogenesis (mechanism), morphologic changes (structural alterations), and functional derangements and clinical significance."
+            },
+            {
+                question: "What is the term for an increase in the size of cells?",
+                options: [
+                    "Hyperplasia",
+                    "Hypertrophy",
+                    "Atrophy",
+                    "Metaplasia"
+                ],
+                correct: "b",
+                explanation: "Hypertrophy is an increase in the size of cells, which leads to an increase in the size of the organ. Examples include enlargement of the left ventricle in hypertensive heart disease."
+            },
+            {
+                question: "Which type of necrosis is characterized by preservation of tissue architecture and is typically seen in myocardial infarction?",
+                options: [
+                    "Coagulative necrosis",
+                    "Liquefactive necrosis",
+                    "Caseous necrosis",
+                    "Fat necrosis"
+                ],
+                correct: "a",
+                explanation: "Coagulative necrosis is characterized by general preservation of tissue architecture and is most often seen with sudden interruption of blood supply to an organ, especially the heart."
+            },
+            {
+                question: "What are the five cardinal signs of acute inflammation?",
+                options: [
+                    "Redness, swelling, heat, pain, loss of function",
+                    "Fever, fatigue, nausea, vomiting, headache",
+                    "Pallor, coldness, numbness, weakness, dizziness",
+                    "Itching, scaling, blistering, crusting, scarring"
+                ],
+                correct: "a",
+                explanation: "The five cardinal signs of acute inflammation are redness (rubor), swelling (tumor), heat (calor), pain (dolor), and loss of function."
+            },
+            {
+                question: "Which cells are the primary cells involved in chronic inflammation?",
+                options: [
+                    "Neutrophils",
+                    "Eosinophils",
+                    "Macrophages and lymphocytes",
+                    "Basophils"
+                ],
+                correct: "c",
+                explanation: "Monocytes and macrophages are the primary cells in chronic inflammation. Other cells include T-lymphocytes, B-lymphocytes, plasma cells, mast cells, and eosinophils."
+            },
+            {
+                question: "What is the process by which lost tissue is replaced by granulation tissue which matures to form scar tissue?",
+                options: [
+                    "Regeneration",
+                    "Resolution",
+                    "Repair",
+                    "Metaplasia"
+                ],
+                correct: "c",
+                explanation: "Repair (healing by scarring) is the replacement of lost tissue by granulation tissue which matures to form scar tissue. This is different from regeneration, which is the replacement of lost tissue by tissues similar in type."
+            },
+            {
+                question: "Which of the following is a localized accumulation of fluid in body tissues?",
+                options: [
+                    "Hyperemia",
+                    "Congestion",
+                    "Edema",
+                    "Thrombosis"
+                ],
+                correct: "c",
+                explanation: "Edema is increased fluid in the interstitial tissue spaces. Hyperemia is an active increase in blood flow, congestion is a passive process from impaired outflow, and thrombosis is the formation of a blood clot."
+            },
+            {
+                question: "What are the three factors that predispose to thrombus formation, known as Virchow's triad?",
+                options: [
+                    "Endothelial injury, stasis or turbulence of blood flow, blood hypercoagulability",
+                    "Hypertension, hyperlipidemia, hyperglycemia",
+                    "Infection, inflammation, ischemia",
+                    "Anemia, leukocytosis, thrombocytopenia"
+                ],
+                correct: "a",
+                explanation: "Virchow's triad consists of endothelial injury, stasis or turbulence of blood flow, and blood hypercoagulability. These three factors predispose to thrombus formation."
+            },
+            {
+                question: "Which of the following is an example of an autosomal dominant disorder?",
+                options: [
+                    "Sickle cell anemia",
+                    "Cystic fibrosis",
+                    "Marfan syndrome",
+                    "Phenylketonuria"
+                ],
+                correct: "c",
+                explanation: "Marfan syndrome is an autosomal dominant disorder caused by mutations in the FBN1 gene. Sickle cell anemia, cystic fibrosis, and phenylketonuria are autosomal recessive disorders."
+            },
+            {
+                question: "What is the term for replacement of one differentiated tissue by another differentiated tissue?",
+                options: [
+                    "Hyperplasia",
+                    "Hypertrophy",
+                    "Atrophy",
+                    "Metaplasia"
+                ],
+                correct: "d",
+                explanation: "Metaplasia is the replacement of one differentiated tissue by another differentiated tissue. An example is squamous metaplasia in the bronchus of cigarette smokers."
+            },
+            {
+                question: "Which of the following is a characteristic feature of apoptosis?",
+                options: [
+                    "Cell swelling and rupture",
+                    "Inflammation",
+                    "Cell shrinkage and fragmentation",
+                    "Nuclear pyknosis, karyorrhexis, and karyolysis"
+                ],
+                correct: "c",
+                explanation: "Apoptosis is characterized by cell shrinkage and fragmentation into apoptotic bodies. It is not accompanied by inflammation, unlike necrosis."
+            },
+            {
+                question: "What is the most common cause of cellular injury?",
+                options: [
+                    "Chemical injury",
+                    "Physical injury",
+                    "Hypoxia",
+                    "Immunologic injury"
+                ],
+                correct: "c",
+                explanation: "Hypoxia (decreased oxygen supply) is the most common cause of cellular injury. It can result from ischemia, anemia, carbon monoxide poisoning, or poor oxygenation."
+            },
+            {
+                question: "Which of the following is a characteristic of labile cells?",
+                options: [
+                    "They have a continuous turnover by programmed division of stem cells",
+                    "They have a low level of replication but can undergo rapid division in response to injury",
+                    "They are non-dividing cells that cannot be replaced if lost",
+                    "They are found only in the nervous system"
+                ],
+                correct: "a",
+                explanation: "Labile cells have a continuous turnover by programmed division of stem cells. They are found in surface epithelium of the GI tract, urinary tract, skin, and in lymphoid and hematopoietic systems."
+            },
+            {
+                question: "What is the term for a decrease in the size of a cell?",
+                options: [
+                    "Hyperplasia",
+                    "Hypertrophy",
+                    "Atrophy",
+                    "Metaplasia"
+                ],
+                correct: "c",
+                explanation: "Atrophy is a decrease in the size of a cell, which can lead to decreased size of the organ. Causes include disuse, undernutrition, decreased endocrine stimulation, denervation, and old age."
+            },
+            {
+                question: "Which type of inflammation is characterized by the production of large amounts of pus?",
+                options: [
+                    "Serous inflammation",
+                    "Fibrinous inflammation",
+                    "Suppurative inflammation",
+                    "Catarrhal inflammation"
+                ],
+                correct: "c",
+                explanation: "Suppurative (purulent) inflammation is characterized by the production of large amounts of pus, which consists of living or dead leukocytes, necrotic tissue debris, bacteria, and edema fluid."
+            },
+            {
+                question: "What is the term for a circumscribed accumulation of pus in a living tissue?",
+                options: [
+                    "Ulcer",
+                    "Fistula",
+                    "Abscess",
+                    "Granuloma"
+                ],
+                correct: "c",
+                explanation: "An abscess is a circumscribed accumulation of pus in a living tissue, encapsulated by a pyogenic membrane consisting of layers of fibrin, inflammatory cells, and granulation tissue."
+            },
+            {
+                question: "Which of the following is a characteristic of granulomatous inflammation?",
+                options: [
+                    "Predominance of neutrophils",
+                    "Presence of epithelioid cells and giant cells",
+                    "Extensive tissue destruction with minimal cellular response",
+                    "Formation of fibrin-rich exudate"
+                ],
+                correct: "b",
+                explanation: "Granulomatous inflammation is characterized by the presence of granulomas, which are microscopic aggregates of epithelioid cells (activated macrophages) and often contain multinucleated giant cells."
+            },
+            {
+                question: "What is the primary chemical mediator released from mast cells in type I hypersensitivity?",
+                options: [
+                    "Prostaglandins",
+                    "Histamine",
+                    "Bradykinin",
+                    "Complement"
+                ],
+                correct: "b",
+                explanation: "Histamine is the primary preformed mediator released from mast cells in type I hypersensitivity reactions. It causes vasodilation, increased vascular permeability, and smooth muscle contraction."
+            },
+            {
+                question: "Which of the following is a characteristic of healing by first intention?",
+                options: [
+                    "Extensive tissue loss",
+                    "Formation of large amounts of granulation tissue",
+                    "Wound contraction",
+                    "Minimal tissue loss with edges approximated"
+                ],
+                correct: "d",
+                explanation: "Healing by first intention (primary union) occurs with minimal tissue loss and when wound edges are approximated, such as in a clean surgical incision."
+            },
+            {
+                question: "What is the term for the phenomenon where the same genetic mutation causes a phenotypic spectrum?",
+                options: [
+                    "Penetrance",
+                    "Expressivity",
+                    "Pleiotropy",
+                    "Anticipation"
+                ],
+                correct: "b",
+                explanation: "Variable expressivity is the ability of the same genetic mutation to cause a phenotypic spectrum. For example, neurofibromatosis type 1 can manifest as only café au lait spots or as multiple tumors and skeletal deformities."
+            },
+            {
+                question: "Which of the following is a feature of Down syndrome?",
+                options: [
+                    "Tall stature",
+                    "Webbed neck",
+                    "Mental retardation and characteristic facial features",
+                    "Gynecomastia"
+                ],
+                correct: "c",
+                explanation: "Down syndrome is characterized by severe mental retardation, broad flat nasal bridge, oblique palpebral fissures, epicanthic folds, large protruding tongue, and congenital heart disease in about 40% of cases."
+            },
+            {
+                question: "What is the most common cause of pulmonary thromboembolism?",
+                options: [
+                    "Thrombi in the deep leg veins",
+                    "Thrombi in the cerebral arteries",
+                    "Thrombi in the coronary arteries",
+                    "Thrombi in the hepatic veins"
+                ],
+                correct: "a",
+                explanation: "95% of pulmonary thromboemboli arise from thrombi in the deep leg veins. These thromboemboli travel with venous return to the right side of the heart and then to the pulmonary arteries."
+            },
+            {
+                question: "Which of the following is a characteristic of Klinefelter syndrome?",
+                options: [
+                    "Short stature",
+                    "Female hypogonadism",
+                    "Male hypogonadism with tall stature",
+                    "Webbed neck"
+                ],
+                correct: "c",
+                explanation: "Klinefelter syndrome (47,XXY) is characterized by male hypogonadism, tall stature, eunuchoid appearance, gynecomastia, and infertility due to atrophic testes with decreased spermatogenesis."
+            },
+            {
+                question: "What is the term for the process by which fluid moves across the capillary wall?",
+                options: [
+                    "Osmosis",
+                    "Filtration",
+                    "Diffusion",
+                    "Active transport"
+                ],
+                correct: "b",
+                explanation: "Fluid movement across the capillary wall is determined by the balance between hydrostatic and oncotic pressures, a process described by Starling forces that results in filtration."
+            },
+            {
+                question: "Which of the following is a feature of Turner syndrome?",
+                options: [
+                    "Tall stature",
+                    "Male hypogonadism",
+                    "Female hypogonadism with short stature",
+                    "Mental retardation"
+                ],
+                correct: "c",
+                explanation: "Turner syndrome (45,X) is characterized by female hypogonadism, short stature, webbed neck, shield-like chest with widely spaced nipples, and replacement of ovaries by fibrous streaks."
+            },
+            {
+                question: "What is the term for the reversible transmission between life and biologic death?",
+                options: [
+                    "Clinical death",
+                    "Biological death",
+                    "Somatic death",
+                    "Cellular death"
+                ],
+                correct: "a",
+                explanation: "Clinical death is the reversible transmission between life and biologic death, defined as the period of respiratory, circulatory and brain arrest during which initiation of resuscitation can lead to recovery."
+            },
+            {
+                question: "Which of the following is a characteristic of irreversible cell injury?",
+                options: [
+                    "Cellular swelling",
+                    "Disaggregation of ribosomes",
+                    "Massive calcium influx and membrane damage",
+                    "Failure of Na-K pump"
+                ],
+                correct: "c",
+                explanation: "Irreversible cell injury is characterized by massive calcium influx, very low pH, and activation of enzymes that damage cell membrane and organelle membranes. This marks the point of no return for the cell."
+            },
+            {
+                question: "What is the term for the process by which leukocytes move from blood vessels to tissues during inflammation?",
+                options: [
+                    "Chemotaxis",
+                    "Margination",
+                    "Diapedesis",
+                    "Phagocytosis"
+                ],
+                correct: "c",
+                explanation: "Diapedesis is the process by which leukocytes escape from venules and small veins by extending pseudopodia through the vascular wall and moving into the tissues."
+            },
+            {
+                question: "Which of the following is a characteristic of systemic lupus erythematosus?",
+                options: [
+                    "It primarily affects males",
+                    "It is characterized by antinuclear antibodies",
+                    "It rarely involves the kidneys",
+                    "It is not associated with autoimmune phenomena"
+                ],
+                correct: "b",
+                explanation: "Systemic lupus erythematosus is characterized by a bewildering array of autoantibodies, particularly antinuclear antibodies (ANAs). It primarily affects women of childbearing age and commonly involves the kidneys, skin, joints, and serosal membranes."
+            },
+            {
+                question: "What is the term for the process by which a thrombus is removed by the action of fibrinolytic enzymes?",
+                options: [
+                    "Propagation",
+                    "Organization",
+                    "Dissolution",
+                    "Recanalization"
+                ],
+                correct: "c",
+                explanation: "Dissolution is the process by which a thrombus may be removed by fibrinolytic activity, particularly if the thrombus is small and the fibrinolytic system is active."
+            },
+            {
+                question: "Which of the following is a characteristic of fat embolism?",
+                options: [
+                    "It typically occurs after myocardial infarction",
+                    "It is usually asymptomatic",
+                    "It causes occlusion of pulmonary or cerebral microvasculature",
+                    "It is most common in elderly women"
+                ],
+                correct: "c",
+                explanation: "Fat embolism typically follows fracture of bones and other types of tissue injury. In severe cases, fat emboli may cause occlusion of pulmonary or cerebral microvasculature, leading to fat embolism syndrome."
+            },
+            {
+                question: "What is the term for an area of ischemic necrosis caused by occlusion of either arterial supply or venous drainage?",
+                options: [
+                    "Thrombosis",
+                    "Embolism",
+                    "Infarction",
+                    "Necrosis"
+                ],
+                correct: "c",
+                explanation: "An infarct is an area of ischemic necrosis caused by occlusion of either the arterial supply or venous drainage in a particular tissue. Nearly 99% of all infarcts result from thrombotic or embolic events."
+            },
+            {
+                question: "Which of the following is a characteristic of red infarcts?",
+                options: [
+                    "They occur in solid organs",
+                    "They are caused by arterial occlusion only",
+                    "They occur in loose tissues or tissues with dual circulation",
+                    "They are always septic"
+                ],
+                correct: "c",
+                explanation: "Red (hemorrhagic) infarcts occur in loose tissues such as the lung which allow blood to collect in the infarct zone, in tissues with dual circulations, in venous occlusions, or when blood flow is reestablished to a site of previous arterial occlusion."
+            },
+            {
+                question: "What is the term for a state in which there is failure of the circulatory system to maintain adequate cellular perfusion?",
+                options: [
+                    "Edema",
+                    "Congestion",
+                    "Shock",
+                    "Infarction"
+                ],
+                correct: "c",
+                explanation: "Shock is a state in which there is failure of the circulatory system to maintain adequate cellular perfusion resulting in widespread reduction in delivery of oxygen and other nutrients to tissues."
+            },
+            {
+                question: "Which of the following is a characteristic of disseminated intravascular coagulation (DIC)?",
+                options: [
+                    "It is always a primary disease",
+                    "It results in increased levels of all coagulation factors",
+                    "It is characterized by simultaneous bleeding and thrombosis",
+                    "It primarily affects young, healthy individuals"
+                ],
+                correct: "c",
+                explanation: "DIC is a thrombohemorrhagic disorder characterized by widespread microvascular thrombosis and consumption of coagulation factors, leading to a bleeding diathesis. It occurs as a complication of various clinical conditions."
+            },
+            {
+                question: "What is the term for the process by which cells are programmed to die during normal development?",
+                options: [
+                    "Necrosis",
+                    "Apoptosis",
+                    "Autolysis",
+                    "Heterolysis"
+                ],
+                correct: "b",
+                explanation: "Apoptosis is the programmed death of single cells within clusters of other cells. It occurs as a physiologic process for removal of cells during embryogenesis, menstruation, etc."
+            },
+            {
+                question: "Which of the following is a characteristic of autosomal recessive disorders?",
+                options: [
+                    "They are expressed in heterozygotes",
+                    "They often show variable expressivity",
+                    "They commonly show complete penetrance",
+                    "They typically manifest in adulthood"
+                ],
+                correct: "c",
+                explanation: "Autosomal recessive disorders commonly show complete penetrance and more uniform expression of the trait than autosomal dominant disorders. They frequently show signs and symptoms early in life."
+            },
+            {
+                question: "What is the term for the presence of 2 or more cell lines with different karyotypes in a single individual?",
+                options: [
+                    "Aneuploidy",
+                    "Polyploidy",
+                    "Mosaicism",
+                    "Chimerism"
+                ],
+                correct: "c",
+                explanation: "Mosaicism is the presence of 2 or more cell lines with different karyotypes in a single individual. It is caused by mitotic errors in early development."
+            },
+            {
+                question: "Which of the following is a characteristic of X-linked recessive disorders?",
+                options: [
+                    "They show male-to-male transmission",
+                    "They affect males and females equally",
+                    "They are transmitted by affected males to all their sons",
+                    "They are more severe in males than in females"
+                ],
+                correct: "d",
+                explanation: "X-linked recessive disorders are more severe in males than in females because males have only one X chromosome and will show the full phenotype, while females may have partial expression due to X-chromosome inactivation."
+            },
+            {
+                question: "What is the term for the process by which neutrophils engulf and destroy microorganisms?",
+                options: [
+                    "Chemotaxis",
+                    "Margination",
+                    "Diapedesis",
+                    "Phagocytosis"
+                ],
+                correct: "d",
+                explanation: "Phagocytosis is the process of engulfment and internalization by specialized cells of particulate material, which includes invading microorganisms, damaged cells, and tissue debris."
+            },
+            {
+                question: "Which of the following is a characteristic of chronic inflammation?",
+                options: [
+                    "Short duration",
+                    "Predominance of neutrophils",
+                    "Presence of fibrosis",
+                    "Absence of tissue destruction"
+                ],
+                correct: "c",
+                explanation: "Chronic inflammation is characterized by long duration, presence of macrophages and lymphocytes, tissue destruction, and fibrosis (scar formation)."
+            },
+            {
+                question: "What is the term for the process by which new blood vessels form during healing?",
+                options: [
+                    "Angiogenesis",
+                    "Vasodilation",
+                    "Vasoconstriction",
+                    "Vascularization"
+                ],
+                correct: "a",
+                explanation: "Angiogenesis (neovascularization) is the proliferation and formation of new small blood vessels during healing. It starts 48 to 72 hours after injury and lasts for several days."
+            },
+            {
+                question: "Which of the following is a characteristic of healing by second intention?",
+                options: [
+                    "Minimal tissue loss",
+                    "Rapid healing",
+                    "Wound contraction",
+                    "Absence of granulation tissue"
+                ],
+                correct: "c",
+                explanation: "Healing by second intention (secondary union) occurs with more extensive tissue loss and is characterized by the formation of abundant granulation tissue and wound contraction."
+            },
+            {
+                question: "What is the term for an exaggerated immune response that results in tissue injury?",
+                options: [
+                    "Autoimmunity",
+                    "Immunodeficiency",
+                    "Hypersensitivity",
+                    "Tolerance"
+                ],
+                correct: "c",
+                explanation: "Hypersensitivity is an exaggerated immune response that results in tissue injury. It is classified into four types (I-IV) based on the mechanism involved."
+            },
+            {
+                question: "Which of the following is a characteristic of type II hypersensitivity?",
+                options: [
+                    "It is mediated by IgE antibodies",
+                    "It involves immune complex deposition",
+                    "It is antibody-mediated and often involves complement activation",
+                    "It is T-cell mediated"
+                ],
+                correct: "c",
+                explanation: "Type II hypersensitivity is mediated by antibodies directed towards antigens present on cell surfaces. It often involves complement activation and can result in cell lysis, opsonization, or antibody-dependent cellular cytotoxicity."
+            },
+            {
+                question: "What is the term for the state in which an individual is incapable of developing an immune response to specific antigens?",
+                options: [
+                    "Autoimmunity",
+                    "Hypersensitivity",
+                    "Tolerance",
+                    "Immunodeficiency"
+                ],
+                correct: "c",
+                explanation: "Immunologic tolerance is a state in which an individual is incapable of developing an immune response to specific antigens. Self-tolerance refers to lack of responsiveness to an individual's own antigens."
+            },
+            {
+                question: "Which of the following is a characteristic of autosomal dominant disorders?",
+                options: [
+                    "They are expressed only in homozygotes",
+                    "They often show reduced penetrance",
+                    "They typically manifest only in childhood",
+                    "They are always caused by new mutations"
+                ],
+                correct: "b",
+                explanation: "Autosomal dominant disorders can show reduced penetrance, meaning some individuals inherit the mutant gene but are phenotypically normal. They can also show variable expressivity."
+            },
+            {
+                question: "What is the term for the process by which the inactive X chromosome is visible as a condensed mass of chromatin?",
+                options: [
+                    "Lyonization",
+                    "Barr body",
+                    "X inactivation",
+                    "All of the above"
+                ],
+                correct: "d",
+                explanation: "The inactive X-chromosome may be visible in an interphase cell as a condensed mass of chromatin called the Barr body. This is the result of X-chromosome inactivation or lyonization."
+            },
+            {
+                question: "Which of the following is a characteristic of multifactorial disorders?",
+                options: [
+                    "They are caused by a single gene mutation",
+                    "They follow classic Mendelian inheritance patterns",
+                    "They result from the combined actions of environmental factors and multiple genes",
+                    "They are always congenital"
+                ],
+                correct: "c",
+                explanation: "Multifactorial disorders result from the combined actions of environmental factors and two or more mutant genes having additive effects. Examples include diabetes mellitus, hypertension, and ischemic heart disease."
+            }
+        ];
+
+        // DOM elements
+        const questionsContainer = document.getElementById('questions-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreElement = document.getElementById('score');
+        const scorePercentage = document.getElementById('score-percentage');
+        const scoreText = document.getElementById('score-text');
+        const performanceFeedback = document.getElementById('performance-feedback');
+        const questionCountElement = document.getElementById('question-count');
+        const totalQuestionsElement = document.getElementById('total-questions');
+
+        // Quiz state
+        let currentQuestion = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+        let score = 0;
+
+        // Initialize quiz
+        function initQuiz() {
+            questionCountElement.textContent = quizData.length;
+            totalQuestionsElement.textContent = quizData.length;
+            
+            // Generate questions dynamically
+            quizData.forEach((questionData, index) => {
+                const questionContainer = document.createElement('div');
+                questionContainer.className = 'question-container';
+                questionContainer.id = `question-${index + 1}`;
+                questionContainer.style.display = index === 0 ? 'block' : 'none';
+                
+                questionContainer.innerHTML = `
+                    <div class="question-number">Question ${index + 1} of ${quizData.length}</div>
+                    <div class="question-text">${questionData.question}</div>
+                    <div class="options-container">
+                        ${questionData.options.map((option, optIndex) => `
+                            <div class="option" data-value="${String.fromCharCode(97 + optIndex)}">
+                                <span class="option-letter">${String.fromCharCode(65 + optIndex)}</span>
+                                <span class="option-text">${option}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="feedback-container" id="feedback-${index + 1}">
+                        <div class="feedback-title">Explanation:</div>
+                        <div class="feedback-text">${questionData.explanation}</div>
+                    </div>
+                `;
+                
+                questionsContainer.appendChild(questionContainer);
+            });
+            
+            // Add event listeners to options
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    selectOption(this);
+                });
+            });
+            
+            updateNavigation();
+        }
+
+        // Update navigation buttons
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === quizData.length - 1) {
+                nextBtn.textContent = 'Submit';
+            } else {
+                nextBtn.textContent = 'Next';
+            }
+            
+            // Highlight selected option if exists
+            if (userAnswers[currentQuestion] !== null) {
+                const selectedOption = document.querySelector(`#question-${currentQuestion + 1} .option[data-value="${userAnswers[currentQuestion]}"]`);
+                if (selectedOption) {
+                    selectedOption.classList.add('selected');
+                }
+            }
+        }
+
+        // Show question
+        function showQuestion(index) {
+            document.querySelectorAll('.question-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            const currentContainer = document.getElementById(`question-${index + 1}`);
+            if (currentContainer) {
+                currentContainer.style.display = 'block';
+            }
+            
+            updateNavigation();
+        }
+
+        // Select option
+        function selectOption(optionElement) {
+            const questionContainer = optionElement.closest('.question-container');
+            const optionsInQuestion = questionContainer.querySelectorAll('.option');
+            const feedbackContainer = questionContainer.querySelector('.feedback-container');
+            const questionIndex = Array.from(document.querySelectorAll('.question-container')).indexOf(questionContainer);
+            const correctAnswer = quizData[questionIndex].correct;
+            const selectedAnswer = optionElement.getAttribute('data-value');
+            
+            // Remove selected class from all options in this question
+            optionsInQuestion.forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Add appropriate classes
+            optionsInQuestion.forEach(opt => {
+                if (opt.getAttribute('data-value') === correctAnswer) {
+                    opt.classList.add('correct');
+                } else if (opt.getAttribute('data-value') === selectedAnswer && selectedAnswer !== correctAnswer) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            optionElement.classList.add('selected');
+            
+            // Store user's answer
+            userAnswers[questionIndex] = selectedAnswer;
+            
+            // Show feedback
+            feedbackContainer.style.display = 'block';
+            
+            // Update score display
+            updateScoreDisplay();
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            score = 0;
+            for (let i = 0; i < quizData.length; i++) {
+                if (userAnswers[i] === quizData[i].correct) {
+                    score++;
+                }
+            }
+            scoreElement.textContent = score;
+        }
+
+        // Calculate and display results
+        function showResults() {
+            // Calculate score
+            score = 0;
+            for (let i = 0; i < quizData.length; i++) {
+                if (userAnswers[i] === quizData[i].correct) {
+                    score++;
+                }
+            }
+            
+            // Update score display
+            const percentage = Math.round((score / quizData.length) * 100);
+            scorePercentage.textContent = `${percentage}%`;
+            scoreText.textContent = `You scored ${score} out of ${quizData.length}`;
+            
+            // Provide feedback based on score
+            if (percentage >= 90) {
+                performanceFeedback.textContent = "Excellent! You have a strong understanding of general pathology concepts.";
+            } else if (percentage >= 80) {
+                performanceFeedback.textContent = "Very good! You have a solid foundation in pathology with minor areas for improvement.";
+            } else if (percentage >= 70) {
+                performanceFeedback.textContent = "Good job! You have a good understanding but could benefit from reviewing some topics.";
+            } else if (percentage >= 60) {
+                performanceFeedback.textContent = "Fair performance. Consider reviewing the material to strengthen your understanding.";
+            } else {
+                performanceFeedback.textContent = "You may need to spend more time studying the pathology material to improve your knowledge.";
+            }
+            
+            // Hide quiz and show results
+            document.querySelector('.quiz-container > .question-container').style.display = 'none';
+            document.querySelector('.navigation').style.display = 'none';
+            resultsContainer.style.display = 'block';
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = Array(quizData.length).fill(null);
+            score = 0;
+            
+            // Reset all options and feedback
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            document.querySelectorAll('.feedback-container').forEach(feedback => {
+                feedback.style.display = 'none';
+            });
+            
+            // Show first question and hide results
+            showQuestion(0);
+            document.querySelector('.navigation').style.display = 'flex';
+            resultsContainer.style.display = 'none';
+            
+            // Update score display
+            scoreElement.textContent = '0';
+        }
+
+        // Event listeners for navigation
+        prevBtn.addEventListener('click', function() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        nextBtn.addEventListener('click', function() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                showResults();
+            }
+        });
+
+        restartBtn.addEventListener('click', restartQuiz);
+
+        // Initialize the quiz
+        initQuiz();
+    </script>
+</body>
+</html>

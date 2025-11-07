@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gastrointestinal Quiz | MedQuiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c 0%, #2a4d8e 50%, #3a6fd0 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, #f46b45, #eea849);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .quiz-container {
+            padding: 30px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #f46b45, #eea849);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .question-counter {
+            text-align: right;
+            margin-bottom: 10px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: #f9f9f9;
+            border-color: #f46b45;
+        }
+
+        .option.selected {
+            background: #fef0eb;
+            border-color: #f46b45;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .option-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #f46b45;
+            color: white;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background: #3a6fd0;
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .score {
+            font-size: 3rem;
+            color: #f46b45;
+            margin: 20px 0;
+        }
+
+        .score-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(to right, #f46b45, #eea849);
+        }
+
+        .home-btn {
+            background: #6c757d;
+        }
+
+        .explanation {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gastrointestinal Secretions & Digestion Quiz</h1>
+            <p>Test your knowledge of GIT secretory functions, digestion, and absorption processes</p>
+        </header>
+
+        <div class="quiz-container" id="quiz-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="question-counter" id="question-counter">Question 1 of 100</div>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="navigation">
+                <button class="btn" id="prev-btn" disabled>Previous</button>
+                <button class="btn" id="next-btn">Next</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Quiz Completed!</h2>
+            <div class="score" id="score">0/100</div>
+            <div class="score-text" id="score-text"></div>
+            <div class="navigation">
+                <button class="btn restart-btn" id="restart-btn">Restart Quiz</button>
+                <button class="btn home-btn" id="home-btn">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gastrointestinal Quiz Questions
+        const questions = [
+            // GIT Secretory Functions (50 questions)
+            {
+                question: "Which of the following is NOT a type of gland found in the gastrointestinal tract?",
+                options: [
+                    "Goblet cells",
+                    "Crypts of Lieberkühn",
+                    "Oxyntic glands",
+                    "Islets of Langerhans"
+                ],
+                correct: 3,
+                explanation: "Islets of Langerhans are endocrine glands in the pancreas, not exocrine glands involved in GIT secretions."
+            },
+            {
+                question: "What is the primary function of mucus in the gastrointestinal tract?",
+                options: [
+                    "Enzyme secretion",
+                    "Hormone production",
+                    "Lubrication and protection",
+                    "Nutrient absorption"
+                ],
+                correct: 2,
+                explanation: "Mucus primarily serves as a lubricant and protective barrier throughout the GIT, preventing damage to the mucosal lining."
+            },
+            {
+                question: "Which salivary gland produces purely serous secretion?",
+                options: [
+                    "Submandibular",
+                    "Sublingual",
+                    "Parotid",
+                    "Buccal"
+                ],
+                correct: 2,
+                explanation: "The parotid glands produce purely serous secretion containing ptyalin (amylase), while other glands produce mixed secretions."
+            },
+            {
+                question: "What enzyme is present in saliva that begins starch digestion?",
+                options: [
+                    "Pepsin",
+                    "Ptyalin",
+                    "Trypsin",
+                    "Lipase"
+                ],
+                correct: 1,
+                explanation: "Ptyalin (salivary amylase) begins starch digestion in the mouth, breaking down starch into smaller carbohydrates."
+            },
+            {
+                question: "How does the ionic composition of saliva differ from plasma?",
+                options: [
+                    "Higher sodium, lower potassium",
+                    "Lower sodium, higher potassium",
+                    "Equal sodium and potassium",
+                    "No significant differences"
+                ],
+                correct: 1,
+                explanation: "Saliva has lower sodium (15 mEq/L) and higher potassium (30 mEq/L) compared to plasma due to ductal modification."
+            },
+            {
+                question: "Which nerve primarily controls salivary secretion?",
+                options: [
+                    "Sympathetic nerves",
+                    "Parasympathetic nerves",
+                    "Somatic nerves",
+                    "Enteric nerves"
+                ],
+                correct: 1,
+                explanation: "Parasympathetic nervous signals from salivatory nuclei in the brain stem are the primary regulators of salivary secretion."
+            },
+            {
+                question: "What is the primary secretion of esophageal glands?",
+                options: [
+                    "Acid",
+                    "Enzymes",
+                    "Mucus",
+                    "Hormones"
+                ],
+                correct: 2,
+                explanation: "Esophageal glands secrete mucus exclusively, providing lubrication for swallowing and protecting the esophageal lining."
+            },
+            {
+                question: "Which cells in the stomach secrete hydrochloric acid?",
+                options: [
+                    "Chief cells",
+                    "Parietal cells",
+                    "G cells",
+                    "Mucous cells"
+                ],
+                correct: 1,
+                explanation: "Parietal (oxyntic) cells in the gastric glands secrete hydrochloric acid and intrinsic factor."
+            },
+            {
+                question: "What is the pH range of gastric juice?",
+                options: [
+                    "4.0-5.0",
+                    "1.0-4.0",
+                    "7.0-8.0",
+                    "8.0-9.0"
+                ],
+                correct: 1,
+                explanation: "Gastric juice has a very low pH ranging from 1.0 to 4.0 due to high hydrochloric acid concentration."
+            },
+            {
+                question: "Which enzyme is secreted in inactive form and activated by stomach acid?",
+                options: [
+                    "Amylase",
+                    "Lipase",
+                    "Pepsinogen",
+                    "Trypsin"
+                ],
+                correct: 2,
+                explanation: "Pepsinogen is secreted by chief cells and activated to pepsin by hydrochloric acid in the stomach."
+            },
+            {
+                question: "What is the 'alkaline tide' phenomenon?",
+                options: [
+                    "Increased blood pH during gastric secretion",
+                    "Decreased blood pH during pancreatic secretion",
+                    "Increased bile alkalinity after meals",
+                    "Decreased intestinal pH during digestion"
+                ],
+                correct: 0,
+                explanation: "Alkaline tide refers to the increased blood pH that occurs when bicarbonate ions diffuse into blood during gastric acid secretion."
+            },
+            {
+                question: "Which hormone stimulates gastric acid secretion?",
+                options: [
+                    "Secretin",
+                    "Gastrin",
+                    "Cholecystokinin",
+                    "Somatostatin"
+                ],
+                correct: 1,
+                explanation: "Gastrin, secreted by G cells in the pyloric glands, stimulates gastric acid secretion and mucosal growth."
+            },
+            {
+                question: "What protects the stomach mucosa from self-digestion?",
+                options: [
+                    "Rapid cell turnover",
+                    "Mucus-bicarbonate barrier",
+                    "Low enzyme concentration",
+                    "Both rapid cell turnover and mucus-bicarbonate barrier"
+                ],
+                correct: 3,
+                explanation: "The stomach is protected by both rapid epithelial cell turnover and the mucus-bicarbonate barrier that prevents acid contact with mucosa."
+            },
+            {
+                question: "Which phase of gastric secretion is triggered by the thought, smell, or taste of food?",
+                options: [
+                    "Gastric phase",
+                    "Cephalic phase",
+                    "Intestinal phase",
+                    "Pancreatic phase"
+                ],
+                correct: 1,
+                explanation: "The cephalic phase is triggered by sensory inputs before food enters the stomach, mediated by vagus nerve stimulation."
+            },
+            {
+                question: "What is the primary function of intrinsic factor?",
+                options: [
+                    "Protein digestion",
+                    "Fat absorption",
+                    "Vitamin B12 absorption",
+                    "Carbohydrate digestion"
+                ],
+                correct: 2,
+                explanation: "Intrinsic factor, secreted by parietal cells, is essential for vitamin B12 absorption in the ileum."
+            },
+            {
+                question: "Which pancreatic secretion neutralizes gastric acid?",
+                options: [
+                    "Enzymes",
+                    "Bicarbonate",
+                    "Mucus",
+                    "Water"
+                ],
+                correct: 1,
+                explanation: "Pancreatic bicarbonate secretion neutralizes acidic chyme entering the duodenum, creating optimal pH for enzyme activity."
+            },
+            {
+                question: "Which enzyme activates trypsinogen to trypsin?",
+                options: [
+                    "Enterokinase",
+                    "Pepsin",
+                    "Chymotrypsin",
+                    "Carboxypeptidase"
+                ],
+                correct: 0,
+                explanation: "Enterokinase, secreted by intestinal mucosa, converts trypsinogen to active trypsin in the small intestine."
+            },
+            {
+                question: "What protects the pancreas from autodigestion?",
+                options: [
+                    "Rapid blood flow",
+                    "Trypsin inhibitor",
+                    "Thick connective tissue",
+                    "Low enzyme production"
+                ],
+                correct: 1,
+                explanation: "The pancreas secretes trypsin inhibitor that prevents premature activation of proteolytic enzymes within the pancreas."
+            },
+            {
+                question: "Which hormone stimulates pancreatic bicarbonate secretion?",
+                options: [
+                    "Gastrin",
+                    "Secretin",
+                    "Cholecystokinin",
+                    "Motilin"
+                ],
+                correct: 1,
+                explanation: "Secretin, released in response to acidic chyme, stimulates pancreatic duct cells to secrete bicarbonate-rich fluid."
+            },
+            {
+                question: "What is the primary stimulus for cholecystokinin (CCK) release?",
+                options: [
+                    "Carbohydrates",
+                    "Proteins and fats",
+                    "Acid",
+                    "Fiber"
+                ],
+                correct: 1,
+                explanation: "CCK is released in response to peptides, amino acids, and fat in the duodenum, stimulating pancreatic enzyme secretion and gallbladder contraction."
+            },
+            {
+                question: "Where are Brunner's glands located?",
+                options: [
+                    "Stomach",
+                    "Duodenum",
+                    "Jejunum",
+                    "Ileum"
+                ],
+                correct: 1,
+                explanation: "Brunner's glands are located in the duodenum and secrete alkaline mucus that protects the mucosa from acidic chyme."
+            },
+            {
+                question: "What is the life cycle of intestinal epithelial cells?",
+                options: [
+                    "1 day",
+                    "3 days",
+                    "5 days",
+                    "10 days"
+                ],
+                correct: 2,
+                explanation: "Intestinal epithelial cells have a rapid turnover with a life cycle of about 5 days, maintaining a healthy absorptive surface."
+            },
+            {
+                question: "Which of the following is NOT a brush border enzyme?",
+                options: [
+                    "Sucrase",
+                    "Lactase",
+                    "Maltase",
+                    "Pepsin"
+                ],
+                correct: 3,
+                explanation: "Pepsin is a gastric enzyme, while sucrase, lactase, and maltase are brush border enzymes in the small intestine."
+            },
+            {
+                question: "What is the primary secretion of the large intestine?",
+                options: [
+                    "Enzymes",
+                    "Acid",
+                    "Mucus",
+                    "Hormones"
+                ],
+                correct: 2,
+                explanation: "The large intestine secretes primarily mucus for lubrication and protection, with no significant digestive enzymes."
+            },
+            {
+                question: "Which organ produces bile?",
+                options: [
+                    "Gallbladder",
+                    "Pancreas",
+                    "Liver",
+                    "Spleen"
+                ],
+                correct: 2,
+                explanation: "The liver hepatocytes produce bile, which is then stored and concentrated in the gallbladder."
+            },
+            {
+                question: "What is the daily bile production?",
+                options: [
+                    "200-400 ml",
+                    "600-1200 ml",
+                    "1500-2000 ml",
+                    "2500-3000 ml"
+                ],
+                correct: 1,
+                explanation: "The liver produces 600-1200 ml of bile daily, which is essential for fat digestion and absorption."
+            },
+            {
+                question: "Which component of bile is critical for fat emulsification?",
+                options: [
+                    "Bilirubin",
+                    "Cholesterol",
+                    "Bile salts",
+                    "Electrolytes"
+                ],
+                correct: 2,
+                explanation: "Bile salts act as detergents that emulsify fats, increasing surface area for pancreatic lipase action."
+            },
+            {
+                question: "What is enterohepatic circulation?",
+                options: [
+                    "Blood flow between intestine and liver",
+                    "Recirculation of bile salts",
+                    "Pancreatic enzyme recycling",
+                    "Gastric acid regulation"
+                ],
+                correct: 1,
+                explanation: "Enterohepatic circulation refers to the recycling of bile salts from intestine back to liver for resecretion."
+            },
+            {
+                question: "Which hormone stimulates gallbladder contraction?",
+                options: [
+                    "Secretin",
+                    "Gastrin",
+                    "Cholecystokinin",
+                    "Insulin"
+                ],
+                correct: 2,
+                explanation: "Cholecystokinin (CCK) stimulates gallbladder contraction and relaxation of the sphincter of Oddi for bile release."
+            },
+            {
+                question: "What gives stool its brown color?",
+                options: [
+                    "Bile salts",
+                    "Stercobilin",
+                    "Cholesterol",
+                    "Mucus"
+                ],
+                correct: 1,
+                explanation: "Stercobilin, derived from bilirubin metabolism, gives stool its characteristic brown color."
+            },
+            {
+                question: "Which of the following increases bile secretion?",
+                options: [
+                    "Choleretics",
+                    "Cholagogues",
+                    "Both choleretics and cholagogues",
+                    "Neither"
+                ],
+                correct: 2,
+                explanation: "Choleretics increase bile formation by the liver, while cholagogues stimulate bile release from the gallbladder."
+            },
+            {
+                question: "What is the primary function of the gallbladder?",
+                options: [
+                    "Bile production",
+                    "Bile concentration and storage",
+                    "Enzyme secretion",
+                    "Hormone production"
+                ],
+                correct: 1,
+                explanation: "The gallbladder stores and concentrates bile between meals, releasing it when needed for fat digestion."
+            },
+            {
+                question: "Which vitamin requires bile for absorption?",
+                options: [
+                    "Vitamin C",
+                    "Vitamin B12",
+                    "Fat-soluble vitamins",
+                    "Water-soluble vitamins"
+                ],
+                correct: 2,
+                explanation: "Fat-soluble vitamins (A, D, E, K) require bile for emulsification and absorption in the small intestine."
+            },
+            {
+                question: "What causes the 'mousy odor' in phenylketonuria?",
+                options: [
+                    "Excess phenylalanine metabolites",
+                    "Bile salt deficiency",
+                    "Pancreatic enzyme deficiency",
+                    "Intestinal bacterial overgrowth"
+                ],
+                correct: 0,
+                explanation: "In phenylketonuria, excess phenylalanine and its metabolites excreted in urine produce a characteristic mousy odor."
+            },
+            {
+                question: "Which cells secrete somatostatin in the stomach?",
+                options: [
+                    "Parietal cells",
+                    "Chief cells",
+                    "G cells",
+                    "D cells"
+                ],
+                correct: 3,
+                explanation: "D cells in the gastric antrum secrete somatostatin, which inhibits gastric acid secretion and gastrin release."
+            },
+            {
+                question: "What is the optimal pH for pepsin activity?",
+                options: [
+                    "1.8-3.5",
+                    "4.0-5.0",
+                    "6.0-7.0",
+                    "7.5-8.5"
+                ],
+                correct: 0,
+                explanation: "Pepsin works optimally in highly acidic conditions (pH 1.8-3.5) and becomes inactive above pH 5.0."
+            },
+            {
+                question: "Which neurotransmitter increases gastrointestinal motility?",
+                options: [
+                    "Norepinephrine",
+                    "Acetylcholine",
+                    "GABA",
+                    "Dopamine"
+                ],
+                correct: 1,
+                explanation: "Acetylcholine increases GI motility, relaxes sphincters, and stimulates secretions throughout the digestive tract."
+            },
+            {
+                question: "What is the primary function of gastric inhibitory polypeptide (GIP)?",
+                options: [
+                    "Stimulate acid secretion",
+                    "Inhibit gastric acid secretion",
+                    "Stimulate pancreatic enzymes",
+                    "Contract gallbladder"
+                ],
+                correct: 1,
+                explanation: "Gastric inhibitory polypeptide (GIP) inhibits gastrin-stimulated gastric acid secretion and delays gastric emptying."
+            },
+            {
+                question: "Which phase of pancreatic secretion is hormonally mediated?",
+                options: [
+                    "Cephalic phase",
+                    "Gastric phase",
+                    "Intestinal phase",
+                    "All phases"
+                ],
+                correct: 2,
+                explanation: "The intestinal phase of pancreatic secretion is primarily hormonally mediated by secretin and CCK in response to chyme."
+            },
+            {
+                question: "What is steatorrhea?",
+                options: [
+                    "Fat malabsorption",
+                    "Protein deficiency",
+                    "Carbohydrate intolerance",
+                    "Vitamin deficiency"
+                ],
+                correct: 0,
+                explanation: "Steatorrhea is the presence of excess fat in stool due to malabsorption, often caused by bile salt deficiency or pancreatic insufficiency."
+            },
+            {
+                question: "Which enzyme digests dietary triglycerides?",
+                options: [
+                    "Amylase",
+                    "Pepsin",
+                    "Lipase",
+                    "Trypsin"
+                ],
+                correct: 2,
+                explanation: "Pancreatic lipase is the primary enzyme that digests triglycerides into monoglycerides and free fatty acids."
+            },
+            {
+                question: "What is the role of carbonic anhydrase in gastric acid secretion?",
+                options: [
+                    "Activates pepsin",
+                    "Produces bicarbonate",
+                    "Emulsifies fats",
+                    "Digests proteins"
+                ],
+                correct: 1,
+                explanation: "Carbonic anhydrase catalyzes the formation of carbonic acid from CO2 and water, providing H+ for acid secretion and HCO3- for the alkaline tide."
+            },
+            {
+                question: "Which of the following inhibits gastric emptying?",
+                options: [
+                    "High fat content in duodenum",
+                    "High carbohydrate content",
+                    "Low pH in stomach",
+                    "High volume in stomach"
+                ],
+                correct: 0,
+                correct: 0,
+                explanation: "High fat content in the duodenum stimulates enterogastric reflexes and hormone release that inhibit gastric emptying."
+            },
+            {
+                question: "What is the function of lysozyme in saliva?",
+                options: [
+                    "Starch digestion",
+                    "Fat digestion",
+                    "Bacterial destruction",
+                    "Protein digestion"
+                ],
+                correct: 2,
+                explanation: "Lysozyme in saliva destroys bacteria by breaking down bacterial cell walls, contributing to oral hygiene."
+            },
+            {
+                question: "Which cells in the small intestine secrete enterokinase?",
+                options: [
+                    "Goblet cells",
+                    "Enterocytes",
+                    "Paneth cells",
+                    "Enteroendocrine cells"
+                ],
+                correct: 1,
+                explanation: "Enterocytes in the intestinal mucosa secrete enterokinase, which activates trypsinogen to trypsin."
+            },
+            {
+                question: "What is the primary energy source for active transport in intestinal absorption?",
+                options: [
+                    "Glucose",
+                    "ATP",
+                    "Fatty acids",
+                    "Amino acids"
+                ],
+                correct: 1,
+                explanation: "ATP provides the energy for active transport mechanisms that move nutrients against concentration gradients in intestinal absorption."
+            },
+            {
+                question: "Which vitamin is produced by colonic bacteria?",
+                options: [
+                    "Vitamin A",
+                    "Vitamin C",
+                    "Vitamin K",
+                    "Vitamin D"
+                ],
+                correct: 2,
+                explanation: "Colonic bacteria synthesize vitamin K, which is then absorbed and utilized by the body."
+            },
+            {
+                question: "What is the role of the gastroesophageal sphincter?",
+                options: [
+                    "Control gastric emptying",
+                    "Prevent esophageal reflux",
+                    "Regulate pancreatic secretion",
+                    "Control bile release"
+                ],
+                correct: 1,
+                explanation: "The gastroesophageal sphincter (lower esophageal sphincter) prevents reflux of gastric contents into the esophagus."
+            },
+            // Digestion and Absorption (50 questions)
+            {
+                question: "Where does the majority of nutrient absorption occur?",
+                options: [
+                    "Stomach",
+                    "Small intestine",
+                    "Large intestine",
+                    "Esophagus"
+                ],
+                correct: 1,
+                explanation: "The small intestine, with its extensive surface area from villi and microvilli, is the primary site for nutrient absorption."
+            },
+            {
+                question: "What is the function of the epiglottis during swallowing?",
+                options: [
+                    "Produce enzymes",
+                    "Secrete mucus",
+                    "Prevent choking",
+                    "Absorb nutrients"
+                ],
+                correct: 2,
+                explanation: "The epiglottis covers the trachea during swallowing to prevent food from entering the respiratory tract."
+            },
+            {
+                question: "Which of the following is NOT a disaccharidase?",
+                options: [
+                    "Sucrase",
+                    "Lactase",
+                    "Maltase",
+                    "Pepsin"
+                ],
+                correct: 3,
+                explanation: "Pepsin is a protease that digests proteins in the stomach, not a disaccharidase that breaks down disaccharides."
+            },
+            {
+                question: "What is the primary function of the large intestine?",
+                options: [
+                    "Nutrient absorption",
+                    "Water and electrolyte absorption",
+                    "Enzyme secretion",
+                    "Fat digestion"
+                ],
+                correct: 1,
+                explanation: "The large intestine primarily absorbs water and electrolytes, forming solid feces from the liquid chyme."
+            },
+            {
+                question: "Which transport mechanism requires energy?",
+                options: [
+                    "Simple diffusion",
+                    "Facilitated diffusion",
+                    "Active transport",
+                    "Osmosis"
+                ],
+                correct: 2,
+                explanation: "Active transport requires ATP energy to move substances against their concentration gradient."
+            },
+            {
+                question: "What is the end product of protein digestion?",
+                options: [
+                    "Fatty acids",
+                    "Monosaccharides",
+                    "Amino acids",
+                    "Glycerol"
+                ],
+                correct: 2,
+                explanation: "Proteins are digested into their constituent amino acids, which are then absorbed into the bloodstream."
+            },
+            {
+                question: "Which organ produces insulin and glucagon?",
+                options: [
+                    "Liver",
+                    "Pancreas",
+                    "Gallbladder",
+                    "Stomach"
+                ],
+                correct: 1,
+                explanation: "The pancreas has endocrine functions producing insulin and glucagon, in addition to its exocrine digestive functions."
+            },
+            {
+                question: "What is peristalsis?",
+                options: [
+                    "Enzyme secretion",
+                    "Wave-like muscle contractions",
+                    "Nutrient absorption",
+                    "Hormone production"
+                ],
+                correct: 1,
+                explanation: "Peristalsis refers to the coordinated wave-like muscle contractions that move food through the gastrointestinal tract."
+            },
+            {
+                question: "Which nutrient leaves the stomach most quickly?",
+                options: [
+                    "Fats",
+                    "Proteins",
+                    "Carbohydrates",
+                    "Fiber"
+                ],
+                correct: 2,
+                explanation: "Carbohydrates generally leave the stomach most quickly, followed by proteins, with fats taking the longest."
+            },
+            {
+                question: "What is the function of bile in fat digestion?",
+                options: [
+                    "Digest triglycerides",
+                    "Emulsify fats",
+                    "Absorb fatty acids",
+                    "Synthesize cholesterol"
+                ],
+                correct: 1,
+                explanation: "Bile salts emulsify fats, breaking large fat globules into smaller droplets to increase surface area for enzyme action."
+            },
+            {
+                question: "Which cells in the small intestine increase surface area for absorption?",
+                options: [
+                    "Goblet cells",
+                    "Villi and microvilli",
+                    "Paneth cells",
+                    "Enteroendocrine cells"
+                ],
+                correct: 1,
+                explanation: "Villi and microvilli dramatically increase the surface area of the small intestine, enhancing nutrient absorption capacity."
+            },
+            {
+                question: "What is the primary energy source for most body cells?",
+                options: [
+                    "Proteins",
+                    "Fats",
+                    "Carbohydrates",
+                    "Vitamins"
+                ],
+                correct: 2,
+                explanation: "Glucose from carbohydrate digestion serves as the primary energy source for most body cells."
+            },
+            {
+                question: "Which vitamin requires intrinsic factor for absorption?",
+                options: [
+                    "Vitamin C",
+                    "Vitamin B12",
+                    "Vitamin D",
+                    "Vitamin K"
+                ],
+                correct: 1,
+                explanation: "Vitamin B12 requires intrinsic factor, secreted by gastric parietal cells, for absorption in the ileum."
+            },
+            {
+                question: "What is the function of hydrochloric acid in the stomach?",
+                options: [
+                    "Emulsify fats",
+                    "Activate pepsin",
+                    "Digest carbohydrates",
+                    "Absorb nutrients"
+                ],
+                correct: 1,
+                explanation: "Hydrochloric acid activates pepsinogen to pepsin and provides the optimal acidic environment for protein digestion."
+            },
+            {
+                question: "Which organ detoxifies substances absorbed from the intestine?",
+                options: [
+                    "Pancreas",
+                    "Liver",
+                    "Gallbladder",
+                    "Spleen"
+                ],
+                correct: 1,
+                explanation: "The liver detoxifies many substances absorbed from the intestine before they enter systemic circulation."
+            },
+            {
+                question: "What is the role of the pyloric sphincter?",
+                options: [
+                    "Control esophageal entry",
+                    "Regulate gastric emptying",
+                    "Control bile release",
+                    "Regulate pancreatic secretion"
+                ],
+                correct: 1,
+                explanation: "The pyloric sphincter controls the passage of chyme from the stomach to the duodenum, regulating gastric emptying."
+            },
+            {
+                question: "Which enzyme begins protein digestion in the stomach?",
+                options: [
+                    "Trypsin",
+                    "Pepsin",
+                    "Amylase",
+                    "Lipase"
+                ],
+                correct: 1,
+                explanation: "Pepsin, activated from pepsinogen by stomach acid, begins protein digestion in the stomach."
+            },
+            {
+                question: "What is the function of the appendix?",
+                options: [
+                    "Digest fiber",
+                    "Store bile",
+                    "Immune function",
+                    "Absorb water"
+                ],
+                correct: 2,
+                explanation: "The appendix contains lymphoid tissue and plays a role in immune function, particularly in early life."
+            },
+            {
+                question: "Which transport process moves water across membranes?",
+                options: [
+                    "Active transport",
+                    "Facilitated diffusion",
+                    "Osmosis",
+                    "Phagocytosis"
+                ],
+                correct: 2,
+                explanation: "Osmosis is the passive movement of water across semipermeable membranes from areas of low solute concentration to high solute concentration."
+            },
+            {
+                question: "What is the primary site for calcium absorption?",
+                options: [
+                    "Stomach",
+                    "Duodenum",
+                    "Jejunum",
+                    "Ileum"
+                ],
+                correct: 1,
+                explanation: "The duodenum is the primary site for calcium absorption, which is enhanced by vitamin D and acidic environment."
+            },
+            {
+                question: "Which hormone stimulates insulin release?",
+                options: [
+                    "Gastrin",
+                    "Secretin",
+                    "GIP",
+                    "Motilin"
+                ],
+                correct: 2,
+                explanation: "Gastric inhibitory polypeptide (GIP) stimulates insulin release in response to glucose in the duodenum."
+            },
+            {
+                question: "What is the function of the haustra in the large intestine?",
+                options: [
+                    "Secrete enzymes",
+                    "Increase surface area",
+                    "Form pouches for mixing",
+                    "Absorb nutrients"
+                ],
+                correct: 2,
+                correct: 2,
+                explanation: "Haustra are pouches in the colon wall that facilitate mixing and slow movement of contents, allowing water absorption."
+            },
+            {
+                question: "Which vitamin is absorbed primarily in the ileum?",
+                options: [
+                    "Vitamin A",
+                    "Vitamin B12",
+                    "Vitamin C",
+                    "Vitamin D"
+                ],
+                correct: 1,
+                explanation: "Vitamin B12, bound to intrinsic factor, is specifically absorbed in the ileum of the small intestine."
+            },
+            {
+                question: "What is the role of the sphincter of Oddi?",
+                options: [
+                    "Control gastric emptying",
+                    "Regulate bile and pancreatic juice entry",
+                    "Prevent esophageal reflux",
+                    "Control defecation"
+                ],
+                correct: 1,
+                explanation: "The sphincter of Oddi controls the flow of bile and pancreatic juice into the duodenum."
+            },
+            {
+                question: "Which enzyme digests lactose?",
+                options: [
+                    "Sucrase",
+                    "Lactase",
+                    "Maltase",
+                    "Amylase"
+                ],
+                correct: 1,
+                explanation: "Lactase, a brush border enzyme, digests lactose into glucose and galactose."
+            },
+            {
+                question: "What is the function of the taeniae coli?",
+                options: [
+                    "Secrete hormones",
+                    "Produce longitudinal muscle bands",
+                    "Absorb nutrients",
+                    "Digest fiber"
+                ],
+                correct: 1,
+                explanation: "Taeniae coli are three longitudinal muscle bands that run the length of the colon, facilitating movement of contents."
+            },
+            {
+                question: "Which nutrient is absorbed into lymph rather than blood?",
+                options: [
+                    "Glucose",
+                    "Amino acids",
+                    "Long-chain fatty acids",
+                    "Water-soluble vitamins"
+                ],
+                correct: 2,
+                explanation: "Long-chain fatty acids and fat-soluble vitamins are absorbed into lymph as chylomicrons, while water-soluble nutrients enter blood directly."
+            },
+            {
+                question: "What is the function of the ileocecal valve?",
+                options: [
+                    "Control gastric emptying",
+                    "Prevent colonic reflux",
+                    "Regulate bile flow",
+                    "Secrete enzymes"
+                ],
+                correct: 1,
+                explanation: "The ileocecal valve prevents backflow of colonic contents into the small intestine."
+            },
+            {
+                question: "Which cells secrete mucus in the intestine?",
+                options: [
+                    "Enterocytes",
+                    "Goblet cells",
+                    "Paneth cells",
+                    "Enteroendocrine cells"
+                ],
+                correct: 1,
+                explanation: "Goblet cells throughout the gastrointestinal tract secrete mucus for lubrication and protection."
+            },
+            {
+                question: "What is the primary function of the rectum?",
+                options: [
+                    "Digest fiber",
+                    "Store feces",
+                    "Absorb nutrients",
+                    "Secrete enzymes"
+                ],
+                correct: 1,
+                explanation: "The rectum serves as a temporary storage site for feces before elimination."
+            },
+            {
+                question: "Which enzyme activates other pancreatic proteases?",
+                options: [
+                    "Trypsin",
+                    "Chymotrypsin",
+                    "Carboxypeptidase",
+                    "Elastase"
+                ],
+                correct: 0,
+                explanation: "Trypsin activates other pancreatic proteases including chymotrypsin, carboxypeptidase, and elastase."
+            },
+            {
+                question: "What is the role of the mesentery?",
+                options: [
+                    "Secrete digestive juices",
+                    "Support and suspend intestines",
+                    "Absorb nutrients",
+                    "Produce hormones"
+                ],
+                correct: 1,
+                explanation: "The mesentery is a fold of membrane that attaches the intestine to the abdominal wall and contains blood vessels, nerves, and lymphatics."
+            },
+            {
+                question: "Which vitamin deficiency causes pernicious anemia?",
+                options: [
+                    "Vitamin B12",
+                    "Vitamin C",
+                    "Vitamin D",
+                    "Vitamin K"
+                ],
+                correct: 0,
+                explanation: "Pernicious anemia results from vitamin B12 deficiency, often due to lack of intrinsic factor for absorption."
+            },
+            {
+                question: "What is the function of the crypts of Lieberkühn?",
+                options: [
+                    "Secrete intestinal juice",
+                    "Absorb nutrients",
+                    "Produce hormones",
+                    "Store bile"
+                ],
+                correct: 0,
+                explanation: "Crypts of Lieberkühn secrete intestinal juice containing water, electrolytes, and mucus throughout the small intestine."
+            },
+            {
+                question: "Which hormone delays gastric emptying?",
+                options: [
+                    "Gastrin",
+                    "Secretin",
+                    "Cholecystokinin",
+                    "Motilin"
+                ],
+                correct: 2,
+                explanation: "Cholecystokinin (CCK) delays gastric emptying, allowing more time for fat digestion in the small intestine."
+            },
+            {
+                question: "What is the primary site for iron absorption?",
+                options: [
+                    "Stomach",
+                    "Duodenum",
+                    "Jejunum",
+                    "Ileum"
+                ],
+                correct: 1,
+                explanation: "The duodenum is the primary site for iron absorption, which is enhanced by acidic environment and vitamin C."
+            },
+            {
+                question: "Which cells secrete hydrochloric acid in the stomach?",
+                options: [
+                    "Chief cells",
+                    "Parietal cells",
+                    "G cells",
+                    "Mucous cells"
+                ],
+                correct: 1,
+                explanation: "Parietal (oxyntic) cells in the gastric glands secrete hydrochloric acid and intrinsic factor."
+            },
+            {
+                question: "What is the function of the gallbladder?",
+                options: [
+                    "Produce bile",
+                    "Store and concentrate bile",
+                    "Digest fats",
+                    "Absorb nutrients"
+                ],
+                correct: 1,
+                explanation: "The gallbladder stores and concentrates bile between meals, releasing it when needed for fat digestion."
+            },
+            {
+                question: "Which enzyme begins carbohydrate digestion in the mouth?",
+                options: [
+                    "Pepsin",
+                    "Amylase",
+                    "Lipase",
+                    "Trypsin"
+                ],
+                correct: 1,
+                explanation: "Salivary amylase (ptyalin) begins starch digestion in the mouth, though most carbohydrate digestion occurs in the small intestine."
+            },
+            {
+                question: "What is the role of the enteric nervous system?",
+                options: [
+                    "Coordinate digestive processes",
+                    "Produce digestive enzymes",
+                    "Absorb nutrients",
+                    "Secrete hormones"
+                ],
+                correct: 0,
+                explanation: "The enteric nervous system coordinates local digestive processes including secretion, absorption, and motility."
+            },
+            {
+                question: "Which vitamin is synthesized by skin exposure to sunlight?",
+                options: [
+                    "Vitamin A",
+                    "Vitamin C",
+                    "Vitamin D",
+                    "Vitamin K"
+                ],
+                correct: 2,
+                explanation: "Vitamin D can be synthesized in the skin upon exposure to ultraviolet B radiation from sunlight."
+            },
+            {
+                question: "What is the function of the anal sphincters?",
+                options: [
+                    "Control defecation",
+                    "Secrete mucus",
+                    "Absorb water",
+                    "Digest fiber"
+                ],
+                correct: 0,
+                explanation: "The internal and external anal sphincters control the release of feces during defecation."
+            },
+            {
+                question: "Which cells in the pancreas produce digestive enzymes?",
+                options: [
+                    "Alpha cells",
+                    "Beta cells",
+                    "Acinar cells",
+                    "Delta cells"
+                ],
+                correct: 2,
+                explanation: "Acinar cells in the exocrine pancreas produce and secrete digestive enzymes into the pancreatic ducts."
+            },
+            {
+                question: "What is the primary function of the esophagus?",
+                options: [
+                    "Digest food",
+                    "Transport food to stomach",
+                    "Absorb nutrients",
+                    "Produce enzymes"
+                ],
+                correct: 1,
+                explanation: "The esophagus functions primarily to transport food from the pharynx to the stomach via peristalsis."
+            },
+            {
+                question: "Which hormone stimulates gastric motility?",
+                options: [
+                    "Gastrin",
+                    "Secretin",
+                    "Cholecystokinin",
+                    "Somatostatin"
+                ],
+                correct: 0,
+                explanation: "Gastrin stimulates both gastric acid secretion and gastric motility, preparing the stomach for digestion."
+            }
+        ];
+
+        // Quiz state variables
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let quizCompleted = false;
+
+        // DOM elements
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const feedbackElement = document.getElementById('feedback');
+        const progressElement = document.getElementById('progress');
+        const questionCounterElement = document.getElementById('question-counter');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const scoreElement = document.getElementById('score');
+        const scoreTextElement = document.getElementById('score-text');
+        const restartButton = document.getElementById('restart-btn');
+        const homeButton = document.getElementById('home-btn');
+
+        // Initialize the quiz
+        function initQuiz() {
+            showQuestion();
+            updateProgress();
+            updateNavigation();
+        }
+
+        // Display current question
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            questionElement.textContent = question.question;
+            questionCounterElement.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            
+            // Clear previous options
+            optionsElement.innerHTML = '';
+            
+            // Create new options
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                if (userAnswers[currentQuestion] === index) {
+                    optionElement.classList.add('selected');
+                }
+                
+                optionElement.innerHTML = `
+                    <span class="option-letter">${String.fromCharCode(65 + index)}</span>
+                    <span class="option-text">${option}</span>
+                `;
+                
+                optionElement.addEventListener('click', () => selectOption(index));
+                optionsElement.appendChild(optionElement);
+            });
+            
+            // Clear feedback
+            feedbackElement.style.display = 'none';
+            feedbackElement.className = 'feedback';
+        }
+
+        // Select an option
+        function selectOption(optionIndex) {
+            if (quizCompleted) return;
+            
+            // Deselect all options
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            
+            // Select clicked option
+            options[optionIndex].classList.add('selected');
+            userAnswers[currentQuestion] = optionIndex;
+            
+            // Show feedback
+            showFeedback(optionIndex);
+            
+            // Update navigation
+            updateNavigation();
+        }
+
+        // Show feedback for selected answer
+        function showFeedback(selectedIndex) {
+            const question = questions[currentQuestion];
+            const isCorrect = selectedIndex === question.correct;
+            
+            feedbackElement.textContent = isCorrect ? 
+                "Correct! " + question.explanation : 
+                "Incorrect. " + question.explanation;
+            feedbackElement.className = isCorrect ? 'feedback correct' : 'feedback incorrect';
+            feedbackElement.style.display = 'block';
+            
+            // Highlight correct and incorrect answers
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Update score if this is the first time answering this question
+            if (userAnswers[currentQuestion] === selectedIndex && isCorrect && !quizCompleted) {
+                score++;
+            }
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressElement.style.width = `${progress}%`;
+        }
+
+        // Update navigation buttons
+        function updateNavigation() {
+            prevButton.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === questions.length - 1) {
+                nextButton.textContent = 'Finish Quiz';
+            } else {
+                nextButton.textContent = 'Next';
+            }
+        }
+
+        // Navigate to next question
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+                updateProgress();
+                updateNavigation();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Navigate to previous question
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+                updateProgress();
+                updateNavigation();
+            }
+        }
+
+        // Finish the quiz and show results
+        function finishQuiz() {
+            quizCompleted = true;
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            scoreElement.textContent = `${score}/${questions.length}`;
+            
+            // Set score text based on performance
+            const percentage = (score / questions.length) * 100;
+            if (percentage >= 90) {
+                scoreTextElement.textContent = "Excellent! You have mastered gastrointestinal physiology.";
+            } else if (percentage >= 70) {
+                scoreTextElement.textContent = "Good job! You have a solid understanding of GIT functions.";
+            } else if (percentage >= 50) {
+                scoreTextElement.textContent = "Not bad! Keep studying to improve your gastrointestinal knowledge.";
+            } else {
+                scoreTextElement.textContent = "Keep studying! Review the material and try again.";
+            }
+        }
+
+        // Restart the quiz
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            quizCompleted = false;
+            
+            quizContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            
+            initQuiz();
+        }
+
+        // Go back to home page
+        function goHome() {
+            window.location.href = "index.html";
+        }
+
+        // Event listeners
+        prevButton.addEventListener('click', prevQuestion);
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', restartQuiz);
+        homeButton.addEventListener('click', goHome);
+
+        // Initialize the quiz when the page loads
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>

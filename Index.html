@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedQuiz - Medical Sciences Test Platform</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { background: linear-gradient(135deg, #1a2a6c 0%, #2a4d8e 50%, #3a6fd0 100%); color:#333; min-height:100vh; display:flex; flex-direction:column; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header { text-align:center; padding: 40px 20px; color:white; }
+        header h1 { font-size:3rem; margin-bottom:10px; text-shadow:2px 2px 4px rgba(0,0,0,0.3); }
+        header p { font-size:1.2rem; max-width:600px; margin:0 auto; opacity:0.9; }
+
+        .main-content { display:flex; flex-wrap:wrap; justify-content:center; gap:30px; margin:30px 0; }
+
+        .card { background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; width:300px; transition:0.3s; }
+        .card:hover { transform:translateY(-10px); box-shadow:0 15px 35px rgba(0,0,0,0.3); }
+
+        .card-header { padding:20px; text-align:center; color:white; font-weight:bold; font-size:1.3rem; }
+        .card-body { padding:25px; text-align:center; }
+        .card-body p { margin-bottom:20px; color:#666; line-height:1.5; }
+
+        .btn { padding:12px 25px; background:#1a2a6c; color:white; text-decoration:none; border-radius:50px; font-weight:bold; transition:0.3s; border:none; cursor:pointer; display:inline-block; }
+        .btn:hover { background:#3a6fd0; transform:scale(1.05); }
+
+        .pathology-card .card-header { background:linear-gradient(to right, #FF416C, #FF4B2B); }
+        .microbiology-card .card-header { background:linear-gradient(to right, #11998e, #38ef7d); }
+        .parasitology-card .card-header { background:linear-gradient(to right, #8E2DE2, #4A00E0); }
+        .biochemistry-card .card-header { background:linear-gradient(to right, #3494E6, #EC6EAD); }
+        .physiology-card .card-header { background:linear-gradient(to right, #f46b45, #eea849); }
+        .pharma-calc-card .card-header { background:linear-gradient(to right, #667eea, #764ba2); }
+
+        .features { display:flex; justify-content:space-around; flex-wrap:wrap; margin:50px 0; background:rgba(255,255,255,0.1); padding:30px; border-radius:15px; backdrop-filter:blur(10px); }
+        .feature { text-align:center; color:white; max-width:250px; margin:15px; }
+
+        footer { margin-top:auto; background:rgba(0,0,0,0.2); color:white; text-align:center; padding:20px; }
+        .footer-links { margin-top:10px; }
+        .footer-links a { color:white; margin:0 10px; text-decoration:none; }
+
+        @media (max-width:768px) { .main-content { flex-direction:column; align-items:center; } .card { width:100%; max-width:400px; } }
+
+        /* Registration Form */
+        #registrationForm { display:flex; flex-direction:column; background:white; padding:30px; border-radius:10px; max-width:400px; margin:50px auto; box-shadow:0 5px 20px rgba(0,0,0,0.2); }
+        #registrationForm label { font-weight:bold; margin-top:10px; }
+        #registrationForm input, #registrationForm select { width:100%; padding:10px; margin:10px 0; border:1px solid #bbb; border-radius:5px; }
+        #registrationForm .btn { width:100%; margin-top:10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>MedQuiz</h1>
+        <p>Test yourself before exam and this app developed to help you to prepare for exam by pharmacy student</p>
+    </header>
+
+    <!-- Registration Form -->
+    <form id="registrationForm" action="https://formspree.io/f/xanlrrdw" method="POST">
+        <label>Full Name</label>
+        <input type="text" name="fullname" required>
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" required>
+
+        <label>Section</label>
+        <select name="section" required>
+            <option value="A">A</option>
+            <option value="B">B</option>
+        </select>
+
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+    <!-- Courses -->
+    <div id="courses" class="main-content" style="display:none;">
+        <div class="card pathology-card">
+            <div class="card-header">Pathology</div>
+            <div class="card-body">
+                <p>Examine disease processes, causes, and effects on the body's structure and function.</p>
+                <a href="pathology-quiz.html" class="btn">Start Quiz</a>
+            </div>
+        </div>
+
+        <div class="card microbiology-card">
+            <div class="card-header">Microbiology</div>
+            <div class="card-body">
+                <p>Explore microorganisms, their characteristics, and their roles in health and disease.</p>
+                <a href="microbiology-quiz.html" class="btn">Start Quiz</a>
+            </div>
+        </div>
+
+        <div class="card parasitology-card">
+            <div class="card-header">Parasitology</div>
+            <div class="card-body">
+                <p>Study parasites, their life cycles, and their interactions with host organisms.</p>
+                <a href="parasitology-quiz.html" class="btn">Start Quiz</a>
+            </div>
+        </div>
+
+        <div class="card biochemistry-card">
+            <div class="card-header">Biochemistry</div>
+            <div class="card-body">
+                <p>Understand chemical processes and substances that occur within living organisms.</p>
+                <a href="biochemistry-quiz.html" class="btn">Start Quiz</a>
+            </div>
+        </div>
+
+        <div class="card physiology-card">
+            <div class="card-header">Physiology</div>
+            <div class="card-body">
+                <p>Learn about normal body functions and mechanisms in living systems.</p>
+                <a href="physiology-quiz.html" class="btn">Start Quiz</a>
+            </div>
+        </div>
+
+        <div class="card pharma-calc-card">
+            <div class="card-header">Pharmaceutical Calculations</div>
+            <div class="card-body">
+                <p>Master dosage calculations, conversions, and pharmaceutical mathematics.</p>
+                <a href="pharma-calc-quiz.html" class="btn">Start Quiz</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div id="features" class="features" style="display:none;">
+        <div class="feature"><i>🔬</i><h3>Medical Focused</h3><p>Content specifically designed for medical and pharmaceutical students.</p></div>
+        <div class="feature"><i>📊</i><h3>Instant Feedback</h3><p>Get immediate results with detailed explanations for each answer.</p></div>
+        <div class="feature"><i>🏆</i><h3>Track Progress</h3><p>Monitor your improvement with our scoring and progress tracking system.</p></div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025<br>Software engineer : A/gefar M/hussein.<br>All rights reserved.</p>
+    <div class="footer-links">
+        <a href="contact.html"><h2><mark>Contact Us</mark></h2></a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+    </div>
+</footer>
+
+<script>
+    // Check if user is already registered
+    if(localStorage.getItem('registered') === 'true') {
+        document.getElementById('registrationForm').style.display = 'none';
+        document.getElementById('courses').style.display = 'flex';
+        document.getElementById('features').style.display = 'flex';
+    }
+
+    // Handle registration form
+    const form = document.getElementById('registrationForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            alert('Registration successful!');
+            localStorage.setItem('registered', 'true');
+            form.style.display = 'none';
+            document.getElementById('courses').style.display = 'flex';
+            document.getElementById('features').style.display = 'flex';
+        }).catch(error => {
+            alert('There was a problem submitting your form.');
+        });
+    });
+</script>
+
+</body>
+</html>
